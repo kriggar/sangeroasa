@@ -65,6 +65,7 @@ from game.items import *  # item/sprite/icon/tooltip helpers
 from game.render.props import *  # decorative/prop/building draw helpers
 from game.world.level_decor import *  # level-decor pack/catalog/layouts/IO/editor
 from game.ui.hud import *  # HUD + in-game UI screens
+from game.ui.hud import draw_hand_cursor, update_and_draw_cursor_fx  # animated cursor + click VFX (not in __all__)
 from game.ui.screens import *  # pre-game screens + ultimate factory
 from game.world.scenes import *  # scene builders
 from game.loaders import *  # rogue/class-visual/vendor/NPC loaders
@@ -657,6 +658,13 @@ def run_session(
     
     gothic_cursor_surface, gothic_cursor_hotspot = build_gothic_cursor()
     pouch_cursor_surface, pouch_cursor_hotspot = build_pouch_cursor()
+    try:
+        _hand_cursor_img = pygame.image.load("assets/cursor/cursor_hand.png").convert_alpha()
+        gothic_cursor_surface = _hand_cursor_img
+        gothic_cursor_hotspot = (_hand_cursor_img.get_width() // 2, 2)
+    except Exception:
+        pass
+    cursor_fx: List[Dict[str, object]] = []  # screen-space click ripples
     vendor_shop_icon = build_vendor_shop_icon()
     # Build red X delete cursor
     _del_cur_sz = 28
@@ -4207,6 +4215,10 @@ def run_session(
             if event.type == pygame.QUIT:
                 persist_progress()
                 return "QUIT"
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button in (1, 3):
+                cursor_fx.append({"pos": event.pos, "t": 0.0, "btn": event.button})
+                if audio is not None:
+                    audio.play_sfx("ui_click", cooldown_ms=40)
             if death_screen_active:
                 trigger_respawn = False
                 if event.type == pygame.KEYDOWN and event.key in (pygame.K_SPACE, pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_ESCAPE):
@@ -8196,7 +8208,7 @@ def run_session(
         mouse_down = pygame.mouse.get_pressed(3)
         cursor_surface = gothic_cursor_surface
         cursor_hotspot = gothic_cursor_hotspot
-        # Swap to pouch cursor when hovering over a vendor in town
+        _cursor_hover = False
         _mpos = pygame.mouse.get_pos()
         if universal_delete_mode:
             cursor_surface = delete_cursor_surface
@@ -8213,8 +8225,7 @@ def run_session(
             _world_mouse = Vector2(_mpos[0] + camera.x, _mpos[1] + camera.y)
             _hov_vendor = pick_vendor(_world_mouse)
             if _hov_vendor is not None:
-                cursor_surface = pouch_cursor_surface
-                cursor_hotspot = pouch_cursor_hotspot
+                _cursor_hover = True
         # ── Delete-confirm dialog (drawn last, on top of everything) ──────────
         _delete_cancel_rect: Optional[pygame.Rect] = None
         if delete_confirm_item is not None:
@@ -8227,13 +8238,11 @@ def run_session(
             )
 
         cursor_pressed = bool(mouse_down[0] or mouse_down[1] or mouse_down[2])
-        draw_gothic_cursor(
-            screen,
-            cursor_surface,
-            cursor_hotspot,
-            _mpos,
-            cursor_pressed,
-        )
+        update_and_draw_cursor_fx(screen, cursor_fx, dt)
+        if universal_delete_mode:
+            draw_gothic_cursor(screen, cursor_surface, cursor_hotspot, _mpos, cursor_pressed)
+        else:
+            draw_hand_cursor(screen, cursor_surface, cursor_hotspot, _mpos, ticks, _cursor_hover, cursor_pressed)
 
         _fps_val = clock.get_fps()
         _fps_col = (120, 240, 140) if _fps_val >= 55 else ((240, 220, 120) if _fps_val >= 40 else (240, 120, 120))

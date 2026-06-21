@@ -558,6 +558,7 @@ class GameAudio:
         add_synth("ui_open", self._synth_effect(0.16, 164, "triangle", sweep=0.26, volume=0.48, noise=0.02, vibrato_hz=3.0, vibrato_depth=0.03, punch=0.12, seed=111), 0.34)
         add_synth("ui_close", self._synth_effect(0.14, 146, "triangle", sweep=-0.28, volume=0.46, noise=0.02, vibrato_hz=2.0, vibrato_depth=0.03, punch=0.08, seed=112), 0.30)
         add_synth("ui_error", self._synth_effect(0.22, 84, "saw", sweep=-0.22, volume=0.52, noise=0.18, punch=0.36, seed=113), 0.38)
+        add_synth("ui_click", self._synth_effect(0.07, 560, "square", sweep=0.12, volume=0.40, noise=0.06, punch=0.55, seed=114), 0.30)
         add_synth("cast_projectile", self._synth_effect(0.24, 176, "saw", sweep=-0.18, volume=0.58, noise=0.06, vibrato_hz=6.0, vibrato_depth=0.05, punch=0.24, seed=121), 0.43)
         add_synth("cast_nova", self._synth_effect(0.34, 118, "square", sweep=-0.10, volume=0.60, noise=0.09, vibrato_hz=4.0, vibrato_depth=0.04, punch=0.40, seed=122), 0.44)
         add_synth("cast_orb", self._synth_effect(0.32, 142, "sine", sweep=0.08, volume=0.56, noise=0.05, vibrato_hz=4.8, vibrato_depth=0.10, punch=0.16, seed=123), 0.41)
