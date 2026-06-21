@@ -61,6 +61,7 @@ from game.data.icons import *  # spell-icon maps & class palettes
 from game.data.items_data import *  # item/equipment data tables
 from game.items import *  # item/sprite/icon/tooltip helpers
 from game.render.props import *  # decorative/prop/building draw helpers
+from game.gameplay_math import *  # gameplay math helpers
 from game.render.shops import *  # vendor shop draw functions
 from game.render.glyphs import *  # tool/item glyph icons
 from game.classes_runtime import *  # class spellbook/skill-tree/passive helpers
@@ -581,52 +582,6 @@ from game.data.spell_layout import *  # spell hotbar key labels & class slot lay
 # clamp / exp_smooth / rotate_vec are imported from game.utils (see top of file).
 
 
-def facing_to_direction(facing: int, default: str = "right") -> str:
-    if int(facing) > 0:
-        return "right"
-    if int(facing) < 0:
-        return "left"
-    return default
-
-
-def xp_required_for_level(level: int) -> int:
-    lvl = max(1, int(level))
-    step = lvl - 1
-    return int(90 + step * 55 + (step * step) * 12)
-
-
-def level_progression_bonus(level: int) -> Tuple[float, float, float]:
-    lvl = max(1, int(level))
-    hp_bonus = 0.0
-    mana_bonus = 0.0
-    regen_bonus = 0.0
-    for lv in range(2, lvl + 1):
-        hp_bonus += 9.0 + (lv // 3)
-        mana_bonus += 6.0 + (lv // 4)
-        regen_bonus += 0.14
-    return hp_bonus, mana_bonus, regen_bonus
-
-
-# rotate_vec is imported from game.utils (see top of file).
-
-
-CLASS_SPELL_VFX_THEMES: Dict[str, Dict[str, Tuple[int, int, int]]] = {
-    "mage": {"core": (108, 196, 252), "accent": (214, 238, 255), "shadow": (84, 126, 214)},
-    "ranger": {"core": (138, 196, 118), "accent": (220, 244, 178), "shadow": (74, 114, 56)},
-    "necromancer": {"core": (176, 140, 224), "accent": (234, 208, 255), "shadow": (102, 74, 146)},
-    "warrior": {"core": (232, 150, 92), "accent": (255, 214, 158), "shadow": (138, 84, 46)},
-    "paladin": {"core": (246, 220, 134), "accent": (255, 246, 188), "shadow": (182, 144, 72)},
-}
-
-
-def spell_class_id(spell_id: str) -> str:
-    sid = str(spell_id).strip().lower()
-    if sid.startswith("necro_"):
-        return "necromancer"
-    for prefix in ("mage", "rogue", "ranger", "warrior", "paladin", "necromancer"):
-        if sid.startswith(f"{prefix}_"):
-            return prefix
-    return ""
 
 
 

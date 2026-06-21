@@ -1,6 +1,6 @@
-"""game/gameplay_math.py — small gameplay math/geometry helpers."""
+"""game/gameplay_math.py — small gameplay math/geometry helpers + spell VFX theme data."""
 import math
-from typing import Tuple, List, Optional
+from typing import Dict, List, Optional, Tuple, Any, Union
 
 from pygame import Vector2
 
