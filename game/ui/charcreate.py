@@ -1,7 +1,7 @@
 """game/ui/charcreate.py — character creation screens (class/name/rogue-sprite pickers)."""
 import math
 import random
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Tuple, Any, Union, Set
 
 import pygame
 from pygame import Vector2
