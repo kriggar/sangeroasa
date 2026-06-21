@@ -659,9 +659,21 @@ def run_session(
     gothic_cursor_surface, gothic_cursor_hotspot = build_gothic_cursor()
     pouch_cursor_surface, pouch_cursor_hotspot = build_pouch_cursor()
     try:
-        _hand_cursor_img = pygame.image.load("assets/cursor/cursor_hand.png").convert_alpha()
+        _hand_cursor_img = pygame.image.load("assets/cursor/cursor_gauntlet.png").convert_alpha()
         gothic_cursor_surface = _hand_cursor_img
-        gothic_cursor_hotspot = (_hand_cursor_img.get_width() // 2, 2)
+        # Hotspot = the pointing tip (topmost-leftmost opaque pixel).
+        _hx, _hy = _hand_cursor_img.get_width() // 2, 0
+        _cw, _ch = _hand_cursor_img.get_width(), _hand_cursor_img.get_height()
+        _found = False
+        for _yy in range(_ch):
+            for _xx in range(_cw):
+                if _hand_cursor_img.get_at((_xx, _yy)).a > 40:
+                    _hx, _hy = _xx, _yy
+                    _found = True
+                    break
+            if _found:
+                break
+        gothic_cursor_hotspot = (_hx, _hy)
     except Exception:
         pass
     cursor_fx: List[Dict[str, object]] = []  # screen-space click ripples

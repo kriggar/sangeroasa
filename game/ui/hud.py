@@ -3272,37 +3272,34 @@ def draw_gothic_cursor(
 
 
 def draw_hand_cursor(screen, sprite, hotspot, mouse_pos, ticks, hovering=False, pressed=False):
-    """Animated gauntlet-hand cursor: pulsing arcane glow on the palm gem, brighter +
-    a ring on hover, a small press offset, and an occasional fingertip twinkle."""
+    """Animated grimdark gauntlet cursor: a pulsing red-ember glow at the pointing tip,
+    brighter + a ring on hover, a small press offset, and an occasional ember twinkle."""
     mx, my = mouse_pos
     hx, hy = hotspot
     off = 1 if pressed else 0
-    sw, sh = sprite.get_width(), sprite.get_height()
-    gem_x = mx - hx + sw // 2 + off
-    gem_y = my - hy + int(sh * 0.66) + off
+    # ember glow centered on the pointing tip (the hotspot = mouse point)
     pulse = 0.5 + 0.5 * math.sin(ticks * 0.006)
-    glow_r = int((9 + (5 if hovering else 0)) + 3 * pulse)
-    alpha = int((46 + 60 * pulse) + (70 if hovering else 0))
-    col = (150, 215, 255) if hovering else (96, 178, 255)
+    glow_r = int((4 + (3 if hovering else 0)) + 2 * pulse)
+    alpha = int((38 + 42 * pulse) + (55 if hovering else 0))
+    col = (255, 150, 70) if hovering else (235, 95, 45)
     if glow_r > 0:
         glow = pygame.Surface((glow_r * 2 + 2, glow_r * 2 + 2), pygame.SRCALPHA)
-        pygame.draw.circle(glow, (*col, min(190, alpha)), (glow_r + 1, glow_r + 1), glow_r)
-        pygame.draw.circle(glow, (*col, min(110, alpha // 2)), (glow_r + 1, glow_r + 1), max(2, glow_r // 2))
-        screen.blit(glow, (gem_x - glow_r - 1, gem_y - glow_r - 1), special_flags=pygame.BLEND_RGBA_ADD)
+        pygame.draw.circle(glow, (*col, min(200, alpha)), (glow_r + 1, glow_r + 1), glow_r)
+        pygame.draw.circle(glow, (*col, min(120, alpha // 2)), (glow_r + 1, glow_r + 1), max(2, glow_r // 2))
+        screen.blit(glow, (mx - glow_r - 1, my - glow_r - 1), special_flags=pygame.BLEND_RGBA_ADD)
     if hovering:
         ring_r = glow_r + 5
         ring = pygame.Surface((ring_r * 2 + 2, ring_r * 2 + 2), pygame.SRCALPHA)
-        pygame.draw.circle(ring, (180, 225, 255, 120), (ring_r + 1, ring_r + 1), ring_r, 1)
-        screen.blit(ring, (gem_x - ring_r - 1, gem_y - ring_r - 1), special_flags=pygame.BLEND_RGBA_ADD)
+        pygame.draw.circle(ring, (255, 180, 110, 120), (ring_r + 1, ring_r + 1), ring_r, 1)
+        screen.blit(ring, (mx - ring_r - 1, my - ring_r - 1), special_flags=pygame.BLEND_RGBA_ADD)
     screen.blit(sprite, (mx - hx + off, my - hy + off))
-    tw = 0.5 + 0.5 * math.sin(ticks * 0.013 + 1.7)
-    if tw > 0.6:
-        ta = int(150 * (tw - 0.6) / 0.4)
-        tx, ty = mx - hx + int(sw * 0.5), my - hy + 2
+    tw = 0.5 + 0.5 * math.sin(ticks * 0.02)
+    if tw > 0.7:
+        ta = int(180 * (tw - 0.7) / 0.3)
         spk = pygame.Surface((9, 9), pygame.SRCALPHA)
-        pygame.draw.line(spk, (235, 248, 255, ta), (4, 1), (4, 7))
-        pygame.draw.line(spk, (235, 248, 255, ta), (1, 4), (7, 4))
-        screen.blit(spk, (tx - 4, ty - 4), special_flags=pygame.BLEND_RGBA_ADD)
+        pygame.draw.line(spk, (255, 225, 180, ta), (4, 1), (4, 7))
+        pygame.draw.line(spk, (255, 225, 180, ta), (1, 4), (7, 4))
+        screen.blit(spk, (mx - 4, my - 4), special_flags=pygame.BLEND_RGBA_ADD)
 
 
 def update_and_draw_cursor_fx(screen, fx_list, dt):
@@ -3320,7 +3317,7 @@ def update_and_draw_cursor_fx(screen, fx_list, dt):
         cx, cy = fx["pos"]
         radius = int(6 + 30 * p)
         a = int(170 * (1.0 - p))
-        col = (255, 150, 90) if fx.get("btn", 1) == 3 else (130, 200, 255)
+        col = (255, 180, 110) if fx.get("btn", 1) == 3 else (255, 110, 55)
         size = radius * 2 + 4
         surf = pygame.Surface((size, size), pygame.SRCALPHA)
         pygame.draw.circle(surf, (*col, a), (size // 2, size // 2), radius, 2)
