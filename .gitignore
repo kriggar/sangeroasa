@@ -19,3 +19,7 @@ Thumbs.db
 
 # Local save files
 sangeroasa_save.json
+
+# refactor probe helper (not committed)
+_probe.py
+game/_pb.py
