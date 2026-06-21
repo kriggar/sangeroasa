@@ -1056,8 +1056,11 @@ def load_rogue_anim_frames(asset_dir: str = "assets/rogue_anim", target_size: in
             dirs["left"] = [pygame.transform.flip(f, True, False) for f in dirs["right"]]
 
     anim_frames: Dict[str, Dict[str, List[pygame.Surface]]] = {st: dict(dirs) for st, dirs in raw.items()}
-    # Aliases so the player state-machine always finds a clip.
-    if "walk" in anim_frames:
+    # Diablo-2 style: you run by default, so normal movement uses the RUN cycle.
+    if "run" in anim_frames:
+        anim_frames["walk"] = {k: list(v) for k, v in anim_frames["run"].items()}
+        fps["walk"] = fps.get("run", 13.0)
+    elif "walk" in anim_frames:
         anim_frames.setdefault("run", {k: list(v) for k, v in anim_frames["walk"].items()})
         fps.setdefault("run", fps.get("walk", 9.0) * 1.35)
     if "attack" in anim_frames:

@@ -1,74 +1,74 @@
 {
  "idle_down": {
-  "frames": 4,
+  "frames": 5,
+  "fps": 6.0
+ },
+ "idle_up": {
+  "frames": 5,
+  "fps": 6.0
+ },
+ "idle_right": {
+  "frames": 5,
   "fps": 6.0
  },
  "walk_down": {
-  "frames": 6,
+  "frames": 8,
   "fps": 10.0
  },
+ "walk_up": {
+  "frames": 8,
+  "fps": 10.0
+ },
+ "walk_right": {
+  "frames": 8,
+  "fps": 10.0
+ },
+ "run_down": {
+  "frames": 8,
+  "fps": 13.0
+ },
+ "run_up": {
+  "frames": 8,
+  "fps": 13.0
+ },
+ "run_right": {
+  "frames": 8,
+  "fps": 13.0
+ },
  "attack_down": {
-  "frames": 4,
+  "frames": 6,
+  "fps": 12.0
+ },
+ "attack_up": {
+  "frames": 6,
+  "fps": 12.0
+ },
+ "attack_right": {
+  "frames": 6,
   "fps": 12.0
  },
  "hurt_down": {
-  "frames": 3,
-  "fps": 12.0
- },
- "death_down": {
-  "frames": 5,
-  "fps": 9.0
- },
- "idle_up": {
-  "frames": 4,
-  "fps": 6.0
- },
- "walk_up": {
-  "frames": 6,
-  "fps": 10.0
- },
- "attack_up": {
   "frames": 4,
   "fps": 12.0
  },
  "hurt_up": {
-  "frames": 3,
-  "fps": 12.0
- },
- "death_up": {
-  "frames": 5,
-  "fps": 9.0
- },
- "idle_right": {
-  "frames": 4,
-  "fps": 6.0
- },
- "walk_right": {
-  "frames": 6,
-  "fps": 10.0
- },
- "attack_right": {
   "frames": 4,
   "fps": 12.0
  },
  "hurt_right": {
-  "frames": 3,
+  "frames": 4,
   "fps": 12.0
  },
- "death_right": {
-  "frames": 5,
+ "death_down": {
+  "frames": 6,
   "fps": 9.0
  },
- "run_down": {
+ "death_up": {
   "frames": 6,
-  "fps": 13.0
+  "fps": 9.0
  },
- "run_up": {
+ "death_right": {
   "frames": 6,
-  "fps": 13.0
- },
- "run_right": {
-  "frames": 6,
-  "fps": 13.0
+  "fps": 9.0
  }
 }
