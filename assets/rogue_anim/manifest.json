@@ -3,7 +3,7 @@
   "frames": 6,
   "fps": 6.0
  },
- "idle_up": {
+ "idle_down_right": {
   "frames": 6,
   "fps": 6.0
  },
@@ -11,11 +11,11 @@
   "frames": 6,
   "fps": 6.0
  },
- "idle_down_right": {
+ "idle_up_right": {
   "frames": 6,
   "fps": 6.0
  },
- "idle_up_right": {
+ "idle_up": {
   "frames": 6,
   "fps": 6.0
  },
@@ -23,7 +23,7 @@
   "frames": 8,
   "fps": 10.0
  },
- "walk_up": {
+ "walk_down_right": {
   "frames": 8,
   "fps": 10.0
  },
@@ -31,11 +31,11 @@
   "frames": 8,
   "fps": 10.0
  },
- "walk_down_right": {
+ "walk_up_right": {
   "frames": 8,
   "fps": 10.0
  },
- "walk_up_right": {
+ "walk_up": {
   "frames": 8,
   "fps": 10.0
  },
@@ -43,7 +43,7 @@
   "frames": 8,
   "fps": 13.0
  },
- "run_up": {
+ "run_down_right": {
   "frames": 8,
   "fps": 13.0
  },
@@ -51,11 +51,11 @@
   "frames": 8,
   "fps": 13.0
  },
- "run_down_right": {
+ "run_up_right": {
   "frames": 8,
   "fps": 13.0
  },
- "run_up_right": {
+ "run_up": {
   "frames": 8,
   "fps": 13.0
  },
@@ -63,7 +63,7 @@
   "frames": 6,
   "fps": 12.0
  },
- "attack_up": {
+ "attack_down_right": {
   "frames": 6,
   "fps": 12.0
  },
@@ -71,11 +71,11 @@
   "frames": 6,
   "fps": 12.0
  },
- "attack_down_right": {
+ "attack_up_right": {
   "frames": 6,
   "fps": 12.0
  },
- "attack_up_right": {
+ "attack_up": {
   "frames": 6,
   "fps": 12.0
  },
@@ -83,7 +83,7 @@
   "frames": 4,
   "fps": 12.0
  },
- "hurt_up": {
+ "hurt_down_right": {
   "frames": 4,
   "fps": 12.0
  },
@@ -91,11 +91,11 @@
   "frames": 4,
   "fps": 12.0
  },
- "hurt_down_right": {
+ "hurt_up_right": {
   "frames": 4,
   "fps": 12.0
  },
- "hurt_up_right": {
+ "hurt_up": {
   "frames": 4,
   "fps": 12.0
  },
@@ -103,7 +103,7 @@
   "frames": 6,
   "fps": 9.0
  },
- "death_up": {
+ "death_down_right": {
   "frames": 6,
   "fps": 9.0
  },
@@ -111,11 +111,11 @@
   "frames": 6,
   "fps": 9.0
  },
- "death_down_right": {
+ "death_up_right": {
   "frames": 6,
   "fps": 9.0
  },
- "death_up_right": {
+ "death_up": {
   "frames": 6,
   "fps": 9.0
  }
