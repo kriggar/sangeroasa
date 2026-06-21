@@ -58,6 +58,7 @@ from game.audio import GameAudio  # procedural audio engine
 
 from game.data.classes import *  # class & skill data tables
 from game.data.world_data import (_POTIONS, TELEPORT_BOOK_ITEM, CLASS_ARMOR_SET_BONUSES, WOLF_MATERIALS, MATERIAL_ORDER, PROFESSION_DEFINITIONS, PROFESSION_ORDER, PROFESSION_MAX_SKILL)
+from game.state import VENDOR_SHOPS, _HUD_STATE
 from game.data.icons import *  # spell-icon maps & class palettes
 from game.data.items_data import *  # item/equipment data tables
 from game.items import *  # item/sprite/icon/tooltip helpers
@@ -85,13 +86,8 @@ if callable(apply_class_overrides):
     apply_class_overrides(CLASS_ARCHETYPES, CLASS_COMBAT_STATS, CLASS_PASSIVES, CLASS_CORE_SKILL_META)
 
 # Items sold by specific vendor roles. key = vendor role string.
-VENDOR_SHOPS: Dict[str, List[Dict[str, object]]] = {}
 
 # Potion definitions — icons from items.txt rows 20-21 (0-indexed)
-VENDOR_SHOPS.update({
-    "Herbalist":     [p for p in _POTIONS if p["effect"] in ("hp_60", "hp_80", "mp_80", "full_restore")],
-    "Quartermaster": list(_POTIONS),
-})
 
 
 for _set_data in CLASS_ARMOR_SETS.values():
@@ -577,19 +573,6 @@ def solve_two_bone(
 
 
 # ─── AAA HUD: persistent state for damage / spend flashes & lerping bars ───
-_HUD_STATE: Dict[str, float] = {
-    "last_hp": -1.0,
-    "last_mana": -1.0,
-    "last_xp": -1.0,
-    "hp_flash": 0.0,         # white flash on damage taken
-    "mp_flash": 0.0,         # cyan flash on mana spend
-    "xp_flash": 0.0,         # purple flash on xp gain
-    "hp_lag": -1.0,          # lagged HP for "ghost" trailing bar
-    "mp_lag": -1.0,
-    "level_pop": 0.0,        # bounce on level-up
-    "last_level": -1.0,
-    "last_tick_ms": -1.0,
-}
 
 
 def _hud_skewed_polygon(rect: pygame.Rect, skew: int = 8) -> List[Tuple[int, int]]:
