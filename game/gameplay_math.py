@@ -5,6 +5,8 @@ from typing import Dict, List, Optional, Tuple, Any, Union
 from pygame import Vector2
 
 __all__ = [
+    'quadratic_bezier',
+    'solve_two_bone',
     'facing_to_direction',
     'xp_required_for_level',
     'level_progression_bonus',
@@ -59,3 +61,34 @@ def spell_class_id(spell_id: str) -> str:
         if sid.startswith(f"{prefix}_"):
             return prefix
     return ""
+
+
+def quadratic_bezier(p0: Vector2, p1: Vector2, p2: Vector2, t: float) -> Vector2:
+    u = 1.0 - t
+    return p0 * (u * u) + p1 * (2.0 * u * t) + p2 * (t * t)
+
+
+def solve_two_bone(
+    root: Vector2,
+    target: Vector2,
+    length_a: float,
+    length_b: float,
+    bend_dir: float = 1.0,
+) -> Vector2:
+    delta = target - root
+    dist = delta.length()
+    if dist <= 1e-6:
+        return root + Vector2(0.0, length_a)
+
+    min_reach = abs(length_a - length_b) + 1e-3
+    max_reach = (length_a + length_b) - 1e-3
+    clamped_dist = clamp(dist, min_reach, max_reach)
+    direction = delta / dist
+
+    a = (length_a * length_a - length_b * length_b + clamped_dist * clamped_dist) / (2.0 * clamped_dist)
+    h_sq = max(length_a * length_a - a * a, 0.0)
+    h = math.sqrt(h_sq)
+
+    mid = root + direction * a
+    perp = Vector2(-direction.y, direction.x) * bend_dir
+    return mid + perp * h
