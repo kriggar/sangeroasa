@@ -19,7 +19,7 @@ except ImportError:
 
 # Canonical tuning constants and asset paths — single source of truth.
 from game.constants import *  # noqa: F401,F403
-from game.utils import clamp, exp_smooth, rotate_vec  # pure math/geometry helpers
+from game.utils import clamp, exp_smooth, rotate_vec, color_lerp  # pure math/geometry/color helpers
 
 # game/ engine modules — architecture split
 try:
@@ -2856,15 +2856,6 @@ def level_progression_bonus(level: int) -> Tuple[float, float, float]:
 
 
 # rotate_vec is imported from game.utils (see top of file).
-
-
-def color_lerp(a: Tuple[int, int, int], b: Tuple[int, int, int], t: float) -> Tuple[int, int, int]:
-    tt = clamp(t, 0.0, 1.0)
-    return (
-        int(a[0] + (b[0] - a[0]) * tt),
-        int(a[1] + (b[1] - a[1]) * tt),
-        int(a[2] + (b[2] - a[2]) * tt),
-    )
 
 
 CLASS_SPELL_VFX_THEMES: Dict[str, Dict[str, Tuple[int, int, int]]] = {

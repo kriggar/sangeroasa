@@ -42,3 +42,12 @@ def hsv_to_rgb(h: float, s: float, v: float) -> Tuple[int, int, int]:
 
 def point_in_rect(px: float, py: float, rx: float, ry: float, rw: float, rh: float) -> bool:
     return rx <= px < rx + rw and ry <= py < ry + rh
+
+
+def color_lerp(a: Tuple[int, int, int], b: Tuple[int, int, int], t: float) -> Tuple[int, int, int]:
+    tt = clamp(t, 0.0, 1.0)
+    return (
+        int(a[0] + (b[0] - a[0]) * tt),
+        int(a[1] + (b[1] - a[1]) * tt),
+        int(a[2] + (b[2] - a[2]) * tt),
+    )
