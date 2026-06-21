@@ -1611,6 +1611,7 @@ def run_session(
     level_banner = "Frozen Tundra" if current_level == "ice_biome" else ("The Wilderness" if current_level == "wilderness" else "Raven Hollow")
     level_banner_timer = 2.8
     level_decor_render_cache: Dict[Tuple[str, int, int], pygame.Surface] = {}
+    _frozen_snapshot = None  # cached world+HUD frame reused while a full-screen menu is open
     medieval_manager = level_decor_assets.get("medieval_manager")
     decor_selected_asset_id: Optional[str] = None
     decor_catalog_filter = "all"
@@ -6645,385 +6646,323 @@ def run_session(
         _player_behind_house = False
         gate_hovered = (current_level == "town" and mouse_world.distance_to(town_gate_pos) <= gate_trigger_radius)
 
-        if current_level == "town":
-            screen.blit(town_surface, (-int(camera.x), -int(camera.y)))
-            # ── Animated grass / foliage sway overlay ──
-            _anim_ticks = pygame.time.get_ticks()
-            _cam_ix, _cam_iy = int(camera.x), int(camera.y)
-            _vis_left = _cam_ix - 20
-            _vis_right = _cam_ix + SCREEN_WIDTH + 20
-            _vis_top = _cam_iy - 20
-            _vis_bottom = _cam_iy + SCREEN_HEIGHT + 20
-            for _fa_x, _fa_y, _fa_kind, _fa_sz in town_foliage_anim:
-                # Frustum cull
-                if _fa_x < _vis_left or _fa_x > _vis_right or _fa_y < _vis_top or _fa_y > _vis_bottom:
-                    continue
-                _sx = _fa_x - _cam_ix
-                _sy = _fa_y - _cam_iy
-                if _fa_kind == "grass_tuft":
-                    # Draw 3-5 swaying grass blades
-                    for _bi in range(4):
-                        _bx = _sx + _bi * 3 - 4
-                        _blade_h = _fa_sz + _bi * 2
-                        # Wind sway: sin wave using ticks + position for phase variation
-                        _sway = math.sin(_anim_ticks * 0.0015 + _fa_x * 0.02 + _bi * 1.3) * 3.5
-                        _sway2 = math.sin(_anim_ticks * 0.0022 + _fa_y * 0.015 + _bi * 0.9) * 1.5
-                        _total_sway = _sway + _sway2
-                        # Color variation per blade
-                        _g_base = 50 + (_bi * 7 + (_fa_x * 3 + _fa_y * 7) % 20)
-                        _gc = (max(0, min(255, _g_base - 14)),
-                               max(0, min(255, _g_base + 22)),
-                               max(0, min(255, _g_base - 22)))
-                        _tip_x = _bx + int(_total_sway)
-                        _tip_y = _sy - _blade_h
-                        _mid_x = _bx + int(_total_sway * 0.4)
-                        _mid_y = _sy - _blade_h // 2
-                        pygame.draw.line(screen, _gc, (_bx, _sy), (_mid_x, _mid_y), 1)
-                        # Lighter tip
-                        _tc = (min(255, _gc[0] + 22), min(255, _gc[1] + 18), min(255, _gc[2] + 14))
-                        pygame.draw.line(screen, _tc, (_mid_x, _mid_y), (_tip_x, _tip_y), 1)
+        _frozen_menu = (show_skill_tree or show_character or show_crafting or show_quest_log or show_professions or show_world_map)
+        _skip_world = _frozen_menu and _frozen_snapshot is not None
+        if _skip_world:
+            screen.blit(_frozen_snapshot, (0, 0))
+        if not _skip_world:
+            if current_level == "town":
+                screen.blit(town_surface, (-int(camera.x), -int(camera.y)))
+                # ── Animated grass / foliage sway overlay ──
+                _anim_ticks = pygame.time.get_ticks()
+                _cam_ix, _cam_iy = int(camera.x), int(camera.y)
+                _vis_left = _cam_ix - 20
+                _vis_right = _cam_ix + SCREEN_WIDTH + 20
+                _vis_top = _cam_iy - 20
+                _vis_bottom = _cam_iy + SCREEN_HEIGHT + 20
+                for _fa_x, _fa_y, _fa_kind, _fa_sz in town_foliage_anim:
+                    # Frustum cull
+                    if _fa_x < _vis_left or _fa_x > _vis_right or _fa_y < _vis_top or _fa_y > _vis_bottom:
+                        continue
+                    _sx = _fa_x - _cam_ix
+                    _sy = _fa_y - _cam_iy
+                    if _fa_kind == "grass_tuft":
+                        # Draw 3-5 swaying grass blades
+                        for _bi in range(4):
+                            _bx = _sx + _bi * 3 - 4
+                            _blade_h = _fa_sz + _bi * 2
+                            # Wind sway: sin wave using ticks + position for phase variation
+                            _sway = math.sin(_anim_ticks * 0.0015 + _fa_x * 0.02 + _bi * 1.3) * 3.5
+                            _sway2 = math.sin(_anim_ticks * 0.0022 + _fa_y * 0.015 + _bi * 0.9) * 1.5
+                            _total_sway = _sway + _sway2
+                            # Color variation per blade
+                            _g_base = 50 + (_bi * 7 + (_fa_x * 3 + _fa_y * 7) % 20)
+                            _gc = (max(0, min(255, _g_base - 14)),
+                                   max(0, min(255, _g_base + 22)),
+                                   max(0, min(255, _g_base - 22)))
+                            _tip_x = _bx + int(_total_sway)
+                            _tip_y = _sy - _blade_h
+                            _mid_x = _bx + int(_total_sway * 0.4)
+                            _mid_y = _sy - _blade_h // 2
+                            pygame.draw.line(screen, _gc, (_bx, _sy), (_mid_x, _mid_y), 1)
+                            # Lighter tip
+                            _tc = (min(255, _gc[0] + 22), min(255, _gc[1] + 18), min(255, _gc[2] + 14))
+                            pygame.draw.line(screen, _tc, (_mid_x, _mid_y), (_tip_x, _tip_y), 1)
 
-            # ── House overlays — transparent when player is behind ──
-            _px, _py = int(player_pos.x), int(player_pos.y)
-            _player_behind_house = False
-            _town_house_overlays_fg: List[Tuple[pygame.Surface, int, int, str]] = []
-            _p_probe_sprite = get_facing_sprite(facing, player_sprite, player_sprite_left)
-            _p_probe_w, _p_probe_h = _p_probe_sprite.get_size()
-            # Use multiple probe points (head/chest grid) to avoid false fades when the
-            # player is merely near a building edge.
-            _p_probe_y_chest = _py - int(_p_probe_h * 0.60)
-            _p_probe_y_head = _py - int(_p_probe_h * 0.82)
-            _p_probe_x1 = max(6, int(_p_probe_w * 0.18))
-            _p_probe_x2 = max(_p_probe_x1 + 4, int(_p_probe_w * 0.32))
-            _p_probe_points: List[Tuple[int, int]] = []
-            for _yy in (_p_probe_y_chest, _p_probe_y_head):
-                for _xo in (0, -_p_probe_x1, _p_probe_x1, -_p_probe_x2, _p_probe_x2):
-                    _p_probe_points.append((_px + _xo, _yy))
-            _p_upper_rect = pygame.Rect(
-                _px - max(6, int(_p_probe_w * 0.28)),
-                _py - max(10, int(_p_probe_h * 0.88)),
-                max(14, int(_p_probe_w * 0.56)),
-                max(16, int(_p_probe_h * 0.56)),
-            )
-            for _ho_entry in town_house_overlays:
-                _ho_surf, _ho_vis, _ho_coll = _ho_entry[0], _ho_entry[1], _ho_entry[2]
-                _ho_tag = _ho_entry[3] if len(_ho_entry) > 3 else ""
-                _ho_arch_local = _ho_entry[4] if len(_ho_entry) > 4 else None
-                # Cull off-screen overlays
-                _ho_sx = _ho_vis.x - _cam_ix
-                _ho_sy = _ho_vis.y - _cam_iy
-                if _ho_sx + _ho_vis.w < 0 or _ho_sx > SCREEN_WIDTH:
-                    continue
-                if _ho_sy + _ho_vis.h < 0 or _ho_sy > SCREEN_HEIGHT:
-                    continue
-                # Check if player is visually behind this house (skip church)
-                _is_behind = False
-                if _ho_tag != "church" and isinstance(_ho_arch_local, pygame.Rect):
-                    # Precise check: player must be north of the house base (behind),
-                    # and their body must overlap opaque architecture pixels.
-                    _base_y = int(_ho_coll.bottom)
-                    if _py < _base_y - 2:
-                        _arch_world = _ho_arch_local.move(_ho_vis.left, _ho_vis.top)
-                        # Broad-phase: avoid triggering from far-away houses on the same column.
-                        if _arch_world.colliderect(_p_upper_rect):
-                            # Additional gating: require proximity to the footprint width.
-                            _x_gate = int(_ho_coll.w * 0.70) + 44
-                            if abs(_px - int(_ho_coll.centerx)) <= _x_gate:
-                                _hit_count = 0
-                                _center_hits = 0
-                                _head_hits = 0
-                                for _tx, _ty in _p_probe_points:
-                                    if not _arch_world.collidepoint(_tx, _ty):
-                                        continue
-                                    _lx = int(_tx - _ho_vis.left)
-                                    _ly = int(_ty - _ho_vis.top)
-                                    if 0 <= _lx < _ho_surf.get_width() and 0 <= _ly < _ho_surf.get_height():
-                                        if _ho_surf.get_at((_lx, _ly)).a >= 180:
-                                            _hit_count += 1
-                                            if abs(_tx - _px) <= _p_probe_x1:
-                                                _center_hits += 1
-                                            if _ty == _p_probe_y_head:
-                                                _head_hits += 1
-                                            # Accept with a couple of solid hits including head + center.
-                                            if _head_hits >= 1 and _center_hits >= 1 and _hit_count >= 2:
-                                                _is_behind = True
-                                                break
-                                            # Or accept with strong overlap even if centered isn't hit.
-                                            if _head_hits >= 1 and _hit_count >= 4:
-                                                _is_behind = True
-                                                break
-                if _is_behind:
-                    _player_behind_house = True
-                    # Draw after actors so it can occlude, but with reduced opacity.
-                    _town_house_overlays_fg.append((_ho_surf, _ho_sx, _ho_sy, _ho_tag))
-                else:
-                    screen.blit(_ho_surf, (_ho_sx, _ho_sy))
-            # Draw animated water on top of the static background
-            ticks = pygame.time.get_ticks()
-            for canal in town_canals:
-                # Only draw if visible
-                screen_rect = canal.move(-int(camera.x), -int(camera.y))
-                if screen_rect.colliderect(screen.get_rect()):
-                    draw_canal_water(screen, screen_rect, ticks, color_base=(28, 36, 44))
-            # Giant central fire pit VFX
-            _draw_fire_pit_vfx(screen, center_x, plaza_center_y_approx,
-                               camera.x, camera.y, ticks)
-            # Small fire pit VFX (town square, west side)
-            if random.random() < 0.45:
-                spawn_particle_burst(
-                    spell_effects,
-                    Vector2(town_square_fire_pit_pos.x, town_square_fire_pit_pos.y - 5),
-                    (255, 90, 30), (255, 180, 60),
-                    count=2,
-                    speed_min=15.0, speed_max=45.0,
-                    life_min=0.6, life_max=1.4,
-                    size_start=5.0, size_end=1.0,
-                    spread=math.tau,
-                    gravity=-55.0,
-                    drag=0.5
+                # ── House overlays — transparent when player is behind ──
+                _px, _py = int(player_pos.x), int(player_pos.y)
+                _player_behind_house = False
+                _town_house_overlays_fg: List[Tuple[pygame.Surface, int, int, str]] = []
+                _p_probe_sprite = get_facing_sprite(facing, player_sprite, player_sprite_left)
+                _p_probe_w, _p_probe_h = _p_probe_sprite.get_size()
+                # Use multiple probe points (head/chest grid) to avoid false fades when the
+                # player is merely near a building edge.
+                _p_probe_y_chest = _py - int(_p_probe_h * 0.60)
+                _p_probe_y_head = _py - int(_p_probe_h * 0.82)
+                _p_probe_x1 = max(6, int(_p_probe_w * 0.18))
+                _p_probe_x2 = max(_p_probe_x1 + 4, int(_p_probe_w * 0.32))
+                _p_probe_points: List[Tuple[int, int]] = []
+                for _yy in (_p_probe_y_chest, _p_probe_y_head):
+                    for _xo in (0, -_p_probe_x1, _p_probe_x1, -_p_probe_x2, _p_probe_x2):
+                        _p_probe_points.append((_px + _xo, _yy))
+                _p_upper_rect = pygame.Rect(
+                    _px - max(6, int(_p_probe_w * 0.28)),
+                    _py - max(10, int(_p_probe_h * 0.88)),
+                    max(14, int(_p_probe_w * 0.56)),
+                    max(16, int(_p_probe_h * 0.56)),
                 )
-            # Giant fire pit particle spawn
-            if random.random() < 0.6:
-                spawn_particle_burst(
-                    spell_effects,
-                    Vector2(center_x, plaza_center_y_approx - 10),
-                    (255, 100, 20), (255, 200, 60),
-                    count=3,
-                    speed_min=20.0, speed_max=60.0,
-                    life_min=0.8, life_max=1.8,
-                    size_start=6.0, size_end=1.0,
-                    spread=math.tau,
-                    gravity=-65.0,
-                    drag=0.4
-                )
-            # Chimney smoke VFX
-            for _cx, _cy in town_chimney_tops:
-                _scx = _cx - int(camera.x)
-                _scy = _cy - int(camera.y)
-                if -50 <= _scx <= SCREEN_WIDTH + 50 and -50 <= _scy <= SCREEN_HEIGHT + 50:
-                    if random.random() < 0.12:
-                        spawn_particle_burst(
-                            spell_effects,
-                            Vector2(_cx, _cy),
-                            (80, 78, 74), (50, 48, 44),
-                            count=1,
-                            speed_min=8.0, speed_max=20.0,
-                            life_min=1.0, life_max=2.5,
-                            size_start=4.0, size_end=8.0,
-                            spread=0.6,
-                            gravity=-30.0,
-                            drag=0.8
-                        )
-            # Arena torch VFX (8 torches on inner wall)
-            _arena_cx_vfx = center_x
-            _arena_cy_vfx = HORIZON_Y + 810
-            _arena_inner_rx, _arena_inner_ry = 190, 110
-            for _ti in range(8):
-                _tang = (_ti / 8) * math.tau + 0.2
-                _atx = _arena_cx_vfx + math.cos(_tang) * (_arena_inner_rx + 2)
-                _aty = _arena_cy_vfx + math.sin(_tang) * (_arena_inner_ry + 2)
-                _ascx = _atx - camera.x
-                _ascy = _aty - camera.y
-                if -30 <= _ascx <= SCREEN_WIDTH + 30 and -30 <= _ascy <= SCREEN_HEIGHT + 30:
-                    if random.random() < 0.3:
-                        spawn_particle_burst(
-                            spell_effects,
-                            Vector2(_atx, _aty - 14),
-                            (255, 160, 40), (255, 100, 20),
-                            count=1,
-                            speed_min=10.0, speed_max=30.0,
-                            life_min=0.3, life_max=0.8,
-                            size_start=3.0, size_end=1.0,
-                            spread=0.8,
-                            gravity=-50.0,
-                            drag=0.4
-                        )
+                for _ho_entry in town_house_overlays:
+                    _ho_surf, _ho_vis, _ho_coll = _ho_entry[0], _ho_entry[1], _ho_entry[2]
+                    _ho_tag = _ho_entry[3] if len(_ho_entry) > 3 else ""
+                    _ho_arch_local = _ho_entry[4] if len(_ho_entry) > 4 else None
+                    # Cull off-screen overlays
+                    _ho_sx = _ho_vis.x - _cam_ix
+                    _ho_sy = _ho_vis.y - _cam_iy
+                    if _ho_sx + _ho_vis.w < 0 or _ho_sx > SCREEN_WIDTH:
+                        continue
+                    if _ho_sy + _ho_vis.h < 0 or _ho_sy > SCREEN_HEIGHT:
+                        continue
+                    # Check if player is visually behind this house (skip church)
+                    _is_behind = False
+                    if _ho_tag != "church" and isinstance(_ho_arch_local, pygame.Rect):
+                        # Precise check: player must be north of the house base (behind),
+                        # and their body must overlap opaque architecture pixels.
+                        _base_y = int(_ho_coll.bottom)
+                        if _py < _base_y - 2:
+                            _arch_world = _ho_arch_local.move(_ho_vis.left, _ho_vis.top)
+                            # Broad-phase: avoid triggering from far-away houses on the same column.
+                            if _arch_world.colliderect(_p_upper_rect):
+                                # Additional gating: require proximity to the footprint width.
+                                _x_gate = int(_ho_coll.w * 0.70) + 44
+                                if abs(_px - int(_ho_coll.centerx)) <= _x_gate:
+                                    _hit_count = 0
+                                    _center_hits = 0
+                                    _head_hits = 0
+                                    for _tx, _ty in _p_probe_points:
+                                        if not _arch_world.collidepoint(_tx, _ty):
+                                            continue
+                                        _lx = int(_tx - _ho_vis.left)
+                                        _ly = int(_ty - _ho_vis.top)
+                                        if 0 <= _lx < _ho_surf.get_width() and 0 <= _ly < _ho_surf.get_height():
+                                            if _ho_surf.get_at((_lx, _ly)).a >= 180:
+                                                _hit_count += 1
+                                                if abs(_tx - _px) <= _p_probe_x1:
+                                                    _center_hits += 1
+                                                if _ty == _p_probe_y_head:
+                                                    _head_hits += 1
+                                                # Accept with a couple of solid hits including head + center.
+                                                if _head_hits >= 1 and _center_hits >= 1 and _hit_count >= 2:
+                                                    _is_behind = True
+                                                    break
+                                                # Or accept with strong overlap even if centered isn't hit.
+                                                if _head_hits >= 1 and _hit_count >= 4:
+                                                    _is_behind = True
+                                                    break
+                    if _is_behind:
+                        _player_behind_house = True
+                        # Draw after actors so it can occlude, but with reduced opacity.
+                        _town_house_overlays_fg.append((_ho_surf, _ho_sx, _ho_sy, _ho_tag))
+                    else:
+                        screen.blit(_ho_surf, (_ho_sx, _ho_sy))
+                # Draw animated water on top of the static background
+                ticks = pygame.time.get_ticks()
+                for canal in town_canals:
+                    # Only draw if visible
+                    screen_rect = canal.move(-int(camera.x), -int(camera.y))
+                    if screen_rect.colliderect(screen.get_rect()):
+                        draw_canal_water(screen, screen_rect, ticks, color_base=(28, 36, 44))
+                # Giant central fire pit VFX
+                _draw_fire_pit_vfx(screen, center_x, plaza_center_y_approx,
+                                   camera.x, camera.y, ticks)
+                # Small fire pit VFX (town square, west side)
+                if random.random() < 0.45:
+                    spawn_particle_burst(
+                        spell_effects,
+                        Vector2(town_square_fire_pit_pos.x, town_square_fire_pit_pos.y - 5),
+                        (255, 90, 30), (255, 180, 60),
+                        count=2,
+                        speed_min=15.0, speed_max=45.0,
+                        life_min=0.6, life_max=1.4,
+                        size_start=5.0, size_end=1.0,
+                        spread=math.tau,
+                        gravity=-55.0,
+                        drag=0.5
+                    )
+                # Giant fire pit particle spawn
+                if random.random() < 0.6:
+                    spawn_particle_burst(
+                        spell_effects,
+                        Vector2(center_x, plaza_center_y_approx - 10),
+                        (255, 100, 20), (255, 200, 60),
+                        count=3,
+                        speed_min=20.0, speed_max=60.0,
+                        life_min=0.8, life_max=1.8,
+                        size_start=6.0, size_end=1.0,
+                        spread=math.tau,
+                        gravity=-65.0,
+                        drag=0.4
+                    )
+                # Chimney smoke VFX
+                for _cx, _cy in town_chimney_tops:
+                    _scx = _cx - int(camera.x)
+                    _scy = _cy - int(camera.y)
+                    if -50 <= _scx <= SCREEN_WIDTH + 50 and -50 <= _scy <= SCREEN_HEIGHT + 50:
+                        if random.random() < 0.12:
+                            spawn_particle_burst(
+                                spell_effects,
+                                Vector2(_cx, _cy),
+                                (80, 78, 74), (50, 48, 44),
+                                count=1,
+                                speed_min=8.0, speed_max=20.0,
+                                life_min=1.0, life_max=2.5,
+                                size_start=4.0, size_end=8.0,
+                                spread=0.6,
+                                gravity=-30.0,
+                                drag=0.8
+                            )
+                # Arena torch VFX (8 torches on inner wall)
+                _arena_cx_vfx = center_x
+                _arena_cy_vfx = HORIZON_Y + 810
+                _arena_inner_rx, _arena_inner_ry = 190, 110
+                for _ti in range(8):
+                    _tang = (_ti / 8) * math.tau + 0.2
+                    _atx = _arena_cx_vfx + math.cos(_tang) * (_arena_inner_rx + 2)
+                    _aty = _arena_cy_vfx + math.sin(_tang) * (_arena_inner_ry + 2)
+                    _ascx = _atx - camera.x
+                    _ascy = _aty - camera.y
+                    if -30 <= _ascx <= SCREEN_WIDTH + 30 and -30 <= _ascy <= SCREEN_HEIGHT + 30:
+                        if random.random() < 0.3:
+                            spawn_particle_burst(
+                                spell_effects,
+                                Vector2(_atx, _aty - 14),
+                                (255, 160, 40), (255, 100, 20),
+                                count=1,
+                                speed_min=10.0, speed_max=30.0,
+                                life_min=0.3, life_max=0.8,
+                                size_start=3.0, size_end=1.0,
+                                spread=0.8,
+                                gravity=-50.0,
+                                drag=0.4
+                            )
 
-        elif current_level == "ice_biome" and ice_surface is not None:
-            screen.blit(ice_surface, (-int(camera.x), -int(camera.y)))
-        else:
-            screen.blit(wilderness_surface, (-int(camera.x), -int(camera.y)))
+            elif current_level == "ice_biome" and ice_surface is not None:
+                screen.blit(ice_surface, (-int(camera.x), -int(camera.y)))
+            else:
+                screen.blit(wilderness_surface, (-int(camera.x), -int(camera.y)))
 
-        tint = day_night.get_tint()
-        if tint[3] > 0:
-            tint_surf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-            tint_surf.fill(tint)
-            screen.blit(tint_surf, (0, 0))
+            tint = day_night.get_tint()
+            if tint[3] > 0:
+                tint_surf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+                tint_surf.fill(tint)
+                screen.blit(tint_surf, (0, 0))
 
-        if combat_runtime is not None:
-            combat_runtime.draw_ground(screen, camera)
-        draw_spell_effects(screen, spell_effects, camera)
-        if combat_runtime is not None:
-            combat_runtime.draw_world(screen, camera)
-        ticks = pygame.time.get_ticks()
-
-        # Book portal VFX — origin portal (at player's casting location)
-        if book_portal_active and book_portal_origin is not None:
-            _bp_progress = 1.0 - (book_portal_timer / book_portal_total) if book_portal_total > 0 else 1.0
-            draw_book_portal(screen, book_portal_origin, camera, ticks, progress=_bp_progress)
-        # Book portal VFX — arrival portal (at destination after teleport)
-        if book_portal_arrival_timer > 0.0 and book_portal_arrival_pos is not None:
-            _bp_fade = book_portal_arrival_timer / 2.5
-            draw_book_portal(screen, book_portal_arrival_pos, camera, ticks, progress=_bp_fade)
-
-        # Draw loot piles (wilderness + ice biome)
-        if current_level in ("wilderness", "ice_biome"):
+            if combat_runtime is not None:
+                combat_runtime.draw_ground(screen, camera)
+            draw_spell_effects(screen, spell_effects, camera)
+            if combat_runtime is not None:
+                combat_runtime.draw_world(screen, camera)
             ticks = pygame.time.get_ticks()
-            for pile in loot_piles:
-                if bool(pile.get("collected", False)):
+
+            # Book portal VFX — origin portal (at player's casting location)
+            if book_portal_active and book_portal_origin is not None:
+                _bp_progress = 1.0 - (book_portal_timer / book_portal_total) if book_portal_total > 0 else 1.0
+                draw_book_portal(screen, book_portal_origin, camera, ticks, progress=_bp_progress)
+            # Book portal VFX — arrival portal (at destination after teleport)
+            if book_portal_arrival_timer > 0.0 and book_portal_arrival_pos is not None:
+                _bp_fade = book_portal_arrival_timer / 2.5
+                draw_book_portal(screen, book_portal_arrival_pos, camera, ticks, progress=_bp_fade)
+
+            # Draw loot piles (wilderness + ice biome)
+            if current_level in ("wilderness", "ice_biome"):
+                ticks = pygame.time.get_ticks()
+                for pile in loot_piles:
+                    if bool(pile.get("collected", False)):
+                        continue
+                    pile_pos = pile.get("pos")
+                    if not isinstance(pile_pos, Vector2):
+                        continue
+                    sx = int(float(pile_pos.x) - camera.x)
+                    sy = int(float(pile_pos.y) - camera.y)
+                    if not (-30 <= sx <= SCREEN_WIDTH + 30 and -30 <= sy <= SCREEN_HEIGHT + 30):
+                        continue
+                    pile_id = int(pile.get("id", -1))
+                    is_open = any(int(win.get("pile_id", -1)) == pile_id for win in open_loot_windows)
+                    is_raised = bool(pile.get("raised", False))
+                    pulse = abs(math.sin(ticks * 0.005)) * 0.5 + 0.5
+                    glow_alpha = int((120 if is_open else 90) * pulse)
+                    glow_surf = pygame.Surface((40, 40), pygame.SRCALPHA)
+                    if is_raised:
+                        glow_col = (184, 164, 232, glow_alpha) if is_open else (132, 110, 188, glow_alpha)
+                        shell_col = (56, 46, 74)
+                        core_col = (150, 126, 214) if is_open else (128, 102, 184)
+                        label_col = (232, 222, 248)
+                    else:
+                        glow_col = (230, 208, 120, glow_alpha) if is_open else (220, 180, 60, glow_alpha)
+                        shell_col = (64, 56, 26)
+                        core_col = (220, 188, 88) if is_open else (200, 165, 50)
+                        label_col = (244, 224, 138)
+                    pygame.draw.circle(glow_surf, glow_col, (20, 20), 18)
+                    screen.blit(glow_surf, (sx - 20, sy - 20))
+                    pygame.draw.circle(screen, shell_col, (sx, sy), 14)
+                    pygame.draw.circle(screen, core_col, (sx, sy), 10)
+                    if player_pos.distance_to(pile_pos) <= 140:
+                        loot_entries = loot_entry_total(pile)
+                        lbl_txt = f"Risen Loot [{loot_entries}]" if is_raised else f"Loot [{loot_entries}]"
+                        lbl = tiny_font.render(lbl_txt, True, label_col)
+                        screen.blit(lbl, (sx - lbl.get_width() // 2, sy - 28))
+
+            ensure_level_decor_selection()
+            current_level_decor = active_level_decor_entries()
+            actors: List[Tuple[float, str, int]] = []
+            ground_decor_indices: List[int] = []
+            overlay_decor_indices: List[int] = []
+            for i, decor_entry in enumerate(current_level_decor):
+                if not isinstance(decor_entry, dict):
                     continue
-                pile_pos = pile.get("pos")
-                if not isinstance(pile_pos, Vector2):
+                decor_asset = level_decor_asset_lookup(level_decor_assets, str(decor_entry.get("asset_id", "")))
+                layer_name = level_decor_asset_layer(decor_asset)
+                if layer_name in ("GROUND", "DECOR"):
+                    ground_decor_indices.append(i)
                     continue
-                sx = int(float(pile_pos.x) - camera.x)
-                sy = int(float(pile_pos.y) - camera.y)
-                if not (-30 <= sx <= SCREEN_WIDTH + 30 and -30 <= sy <= SCREEN_HEIGHT + 30):
+                if layer_name in ("OVERLAY", "VFX"):
+                    overlay_decor_indices.append(i)
                     continue
-                pile_id = int(pile.get("id", -1))
-                is_open = any(int(win.get("pile_id", -1)) == pile_id for win in open_loot_windows)
-                is_raised = bool(pile.get("raised", False))
-                pulse = abs(math.sin(ticks * 0.005)) * 0.5 + 0.5
-                glow_alpha = int((120 if is_open else 90) * pulse)
-                glow_surf = pygame.Surface((40, 40), pygame.SRCALPHA)
-                if is_raised:
-                    glow_col = (184, 164, 232, glow_alpha) if is_open else (132, 110, 188, glow_alpha)
-                    shell_col = (56, 46, 74)
-                    core_col = (150, 126, 214) if is_open else (128, 102, 184)
-                    label_col = (232, 222, 248)
-                else:
-                    glow_col = (230, 208, 120, glow_alpha) if is_open else (220, 180, 60, glow_alpha)
-                    shell_col = (64, 56, 26)
-                    core_col = (220, 188, 88) if is_open else (200, 165, 50)
-                    label_col = (244, 224, 138)
-                pygame.draw.circle(glow_surf, glow_col, (20, 20), 18)
-                screen.blit(glow_surf, (sx - 20, sy - 20))
-                pygame.draw.circle(screen, shell_col, (sx, sy), 14)
-                pygame.draw.circle(screen, core_col, (sx, sy), 10)
-                if player_pos.distance_to(pile_pos) <= 140:
-                    loot_entries = loot_entry_total(pile)
-                    lbl_txt = f"Risen Loot [{loot_entries}]" if is_raised else f"Loot [{loot_entries}]"
-                    lbl = tiny_font.render(lbl_txt, True, label_col)
-                    screen.blit(lbl, (sx - lbl.get_width() // 2, sy - 28))
-
-        ensure_level_decor_selection()
-        current_level_decor = active_level_decor_entries()
-        actors: List[Tuple[float, str, int]] = []
-        ground_decor_indices: List[int] = []
-        overlay_decor_indices: List[int] = []
-        for i, decor_entry in enumerate(current_level_decor):
-            if not isinstance(decor_entry, dict):
-                continue
-            decor_asset = level_decor_asset_lookup(level_decor_assets, str(decor_entry.get("asset_id", "")))
-            layer_name = level_decor_asset_layer(decor_asset)
-            if layer_name in ("GROUND", "DECOR"):
-                ground_decor_indices.append(i)
-                continue
-            if layer_name in ("OVERLAY", "VFX"):
-                overlay_decor_indices.append(i)
-                continue
-            try:
-                decor_y = float(decor_entry.get("y", 0.0))
-            except (TypeError, ValueError):
-                continue
-            actors.append((decor_y, "decor", i))
-        if current_level == "town":
-            for i, vendor in enumerate(vendors):
-                actors.append((float(vendor["pos"].y), "vendor", i))
-            for i, fa in enumerate(farm_animals):
-                fa_pos = fa.get("pos")
-                if isinstance(fa_pos, Vector2):
-                    actors.append((float(fa_pos.y), "farm_animal", i))
-            actors.append((float(town_square_fire_pit_pos.y), "fire", 0))
-        else:
-            for i, wolf in enumerate(active_enemies()):
-                actors.append((float(wolf["pos"].y), "predator", i))
-            for i, critter in enumerate(active_passives()):
-                actors.append((float(critter["pos"].y), "wildlife", i))
-            for i, summon in enumerate(summoned_skeletons):
-                summon_pos = summon.get("pos")
-                if isinstance(summon_pos, Vector2):
-                    actors.append((float(summon_pos.y), "skeleton", i))
-
-        actors.append((player_pos.y, "player", -1))
-        actors.sort(key=lambda item: item[0])
-        vendor_quest_markers: Dict[int, str] = {}
-        if current_level == "town":
-            for i, vendor in enumerate(vendors):
-                role = str(vendor.get("role", ""))
-                marker = quest_marker_for_vendor_role(role, quest_states, QUEST_DEFINITIONS)
-                if marker:
-                    vendor_quest_markers[i] = marker
-
-        for decor_index in ground_decor_indices:
-            if 0 <= decor_index < len(current_level_decor):
-                decor_entry = current_level_decor[decor_index]
-                if isinstance(decor_entry, dict):
-                    draw_level_decor_instance(
-                        screen,
-                        decor_entry,
-                        level_decor_assets,
-                        level_decor_render_cache,
-                        camera,
-                    )
-
-        # Draw all vendor stands first so shop walls are always behind actors.
-        # Use int(camera) to match the town_surface blit offset and avoid 1px sub-pixel flicker.
-        _vendor_behind_flags: list = []  # per-vendor: True if player is behind this vendor's shop
-        if current_level == "town":
-            _cam_ix, _cam_iy = int(camera.x), int(camera.y)
-            _px, _py = int(player_pos.x), int(player_pos.y)
-            for vendor in vendors:
-                _shop_world = vendor.get("shop_pos")
-                if isinstance(_shop_world, Vector2):
-                    _shop_screen = Vector2(_shop_world.x - _cam_ix, _shop_world.y - _cam_iy)
-                else:
-                    _vpos = vendor["pos"]
-                    _shop_screen = Vector2(_vpos.x - _cam_ix, _vpos.y - _cam_iy)
-                # Viewport cull: shop stands are large and expensive to draw; skip any
-                # whose footprint is fully off-screen (generous margin for big buildings).
-                if (_shop_screen.x < -480 or _shop_screen.x > SCREEN_WIDTH + 480 or
-                        _shop_screen.y < -640 or _shop_screen.y > SCREEN_HEIGHT + 320):
-                    _vendor_behind_flags.append(False)
+                try:
+                    decor_y = float(decor_entry.get("y", 0.0))
+                except (TypeError, ValueError):
                     continue
-                # Check if player is behind this shop (use both stand and vendor pos)
-                _sw = _shop_world if isinstance(_shop_world, Vector2) else vendor["pos"]
-                _vw = vendor["pos"]
-                _shop_margin = 120
-                _check_y = min(_sw.y, _vw.y)  # use the furthest-north position
-                _check_x = (_sw.x + _vw.x) / 2  # midpoint between stand and vendor
-                _v_behind = (_py < _check_y - 10 and
-                             _py > _check_y - 250 and
-                             abs(_px - _check_x) < _shop_margin + 80)
-                _vendor_behind_flags.append(_v_behind)
-                if _v_behind:
-                    # Draw stand to temp surface, apply transparency
-                    _vs_w, _vs_h = 700, 700
-                    _vs_tmp = pygame.Surface((_vs_w, _vs_h), pygame.SRCALPHA)
-                    # Position center-bottom of the surface at the shop screen pos
-                    _vs_center = Vector2(_vs_w // 2, _vs_h - 100)
-                    draw_vendor_stand(
-                        _vs_tmp, _vs_center,
-                        str(vendor.get("role", "")).strip().lower(),
-                        ticks, int(vendor.get("stand_seed", 0)),
-                        rotation=float(vendor.get("shop_rotation", 0.0)),
-                    )
-                    _vs_alpha = pygame.Surface((_vs_w, _vs_h), pygame.SRCALPHA)
-                    _vs_alpha.fill((255, 255, 255, 120))
-                    _vs_tmp.blit(_vs_alpha, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-                    screen.blit(_vs_tmp, (int(_shop_screen.x) - _vs_w // 2,
-                                          int(_shop_screen.y) - _vs_h + 100))
-                else:
-                    draw_vendor_stand(
-                        screen, _shop_screen,
-                        str(vendor.get("role", "")).strip().lower(),
-                        ticks, int(vendor.get("stand_seed", 0)),
-                        rotation=float(vendor.get("shop_rotation", 0.0)),
-                    )
+                actors.append((decor_y, "decor", i))
+            if current_level == "town":
+                for i, vendor in enumerate(vendors):
+                    actors.append((float(vendor["pos"].y), "vendor", i))
+                for i, fa in enumerate(farm_animals):
+                    fa_pos = fa.get("pos")
+                    if isinstance(fa_pos, Vector2):
+                        actors.append((float(fa_pos.y), "farm_animal", i))
+                actors.append((float(town_square_fire_pit_pos.y), "fire", 0))
+            else:
+                for i, wolf in enumerate(active_enemies()):
+                    actors.append((float(wolf["pos"].y), "predator", i))
+                for i, critter in enumerate(active_passives()):
+                    actors.append((float(critter["pos"].y), "wildlife", i))
+                for i, summon in enumerate(summoned_skeletons):
+                    summon_pos = summon.get("pos")
+                    if isinstance(summon_pos, Vector2):
+                        actors.append((float(summon_pos.y), "skeleton", i))
 
-        for _, actor_type, idx in actors:
-            if actor_type == "decor":
-                if 0 <= idx < len(current_level_decor):
-                    decor_entry = current_level_decor[idx]
+            actors.append((player_pos.y, "player", -1))
+            actors.sort(key=lambda item: item[0])
+            vendor_quest_markers: Dict[int, str] = {}
+            if current_level == "town":
+                for i, vendor in enumerate(vendors):
+                    role = str(vendor.get("role", ""))
+                    marker = quest_marker_for_vendor_role(role, quest_states, QUEST_DEFINITIONS)
+                    if marker:
+                        vendor_quest_markers[i] = marker
+
+            for decor_index in ground_decor_indices:
+                if 0 <= decor_index < len(current_level_decor):
+                    decor_entry = current_level_decor[decor_index]
                     if isinstance(decor_entry, dict):
                         draw_level_decor_instance(
                             screen,
@@ -7032,961 +6971,1032 @@ def run_session(
                             level_decor_render_cache,
                             camera,
                         )
-            elif actor_type == "player":
-                player_draw_state = "run" if (moving and speed_boost_timer > 0.0) else ("walk" if moving else "idle")
-                player_draw_timer = player_anim_timer
-                if player_hurt_anim_state:
-                    player_draw_state = player_hurt_anim_state
-                    player_draw_timer = player_hurt_anim_elapsed
-                elif player_attack_anim_state:
-                    player_draw_state = player_attack_anim_state
-                    player_draw_timer = player_attack_anim_elapsed
-                draw_player(
-                    screen,
-                    player_pos - camera,
-                    facing,
-                    player_sprite,
-                    player_sprite_left,
-                    is_moving=moving,
-                    anim_timer=player_draw_timer,
-                    anim_frames=player_anim_frames,
-                    anim_state=player_draw_state,
-                    anim_direction=player_anim_direction,
-                    anim_fps=player_anim_fps,
-                    equip_tint_right=player_equip_tint,
-                    equip_tint_left=player_equip_tint_left,
-                    hit_flash_strength=clamp(player_hit_flash_timer / max(0.01, player_hit_flash_duration), 0.0, 1.0),
-                )
-                # ── Glowing contour when player is behind a house ──
-                if _player_behind_house and current_level == "town":
-                    _cs = get_facing_sprite(facing, player_sprite, player_sprite_left)
-                    if _cs is not None:
-                        _cw, _ch = _cs.get_size()
-                        _cp = _cs.get_rect(midbottom=(int(player_pos.x - camera.x), int(player_pos.y - camera.y) + 1))
-                        _outline_pad = 3
-                        _ol_w = _cw + _outline_pad * 2
-                        _ol_h = _ch + _outline_pad * 2
-                        _ol_surf = pygame.Surface((_ol_w, _ol_h), pygame.SRCALPHA)
-                        # Create colored silhouette using pygame.mask
-                        _spr_mask = pygame.mask.from_surface(_cs, 50)
-                        _sil = _spr_mask.to_surface(setcolor=(220, 200, 140, 255), unsetcolor=(0, 0, 0, 0))
-                        # Stamp silhouette at 8 offsets to form outline
-                        for _odx, _ody in [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(1,-1),(-1,1),(1,1)]:
-                            _ol_surf.blit(_sil, (_outline_pad + _odx * 2, _outline_pad + _ody * 2))
-                        # Cut out center so only border remains
-                        _erase = _spr_mask.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0, 0, 0, 0))
-                        _ol_surf.blit(_erase, (_outline_pad, _outline_pad), special_flags=pygame.BLEND_RGBA_SUB)
-                        # Pulse alpha
-                        _ol_alpha = int(160 + 60 * math.sin(ticks * 0.006))
-                        _ol_surf.set_alpha(_ol_alpha)
-                        screen.blit(_ol_surf, (_cp.x - _outline_pad, _cp.y - _outline_pad))
-                # ── Debuff icons above player head (from sprite sheet) ──
-                _p_fx = status_effects.get_effects(StatusEffectSystem.PLAYER_KEY)
-                if _p_fx:
-                    _DEBUFF_SHEET = "assets/items food everything.png"
-                    _DEBUFF_ICON_MAP = {
-                        "bite": (16, 4),   # red claw scratch — row 16, col 4
-                        "fear": (46, 0),   # purple swirl — row 46, col 0
-                    }
-                    _dbi_size = 28
-                    _dbi_count = 0
-                    _px_scr = int(player_pos.x - camera.x)
-                    _py_scr = int(player_pos.y - camera.y) - 68  # above head
-                    for _dfx in _p_fx:
-                        _dbi_rc = _DEBUFF_ICON_MAP.get(_dfx.kind)
-                        if _dbi_rc is None:
-                            continue
-                        _dbi_icon = load_arbitrary_sheet_icon(
-                            _DEBUFF_SHEET, _dbi_rc[0], _dbi_rc[1],
-                            tile_size=64, size=_dbi_size,
-                        )
-                        if _dbi_icon is None:
-                            continue
-                        _dbi_x = _px_scr - (_dbi_size // 2) + _dbi_count * (_dbi_size + 4) - ((_dbi_size + 4) * min(len(_p_fx), 3) // 2) + (_dbi_size + 4) // 2
-                        _dbi_y = _py_scr + int(math.sin(pygame.time.get_ticks() * 0.004 + _dbi_count * 1.2) * 3)
-                        # Pulsing alpha based on remaining duration
-                        _dbi_alpha = max(120, min(255, int(180 + 75 * math.sin(pygame.time.get_ticks() * 0.008 + _dbi_count))))
-                        _dbi_copy = _dbi_icon.copy()
-                        _dbi_copy.set_alpha(_dbi_alpha)
-                        screen.blit(_dbi_copy, (_dbi_x, _dbi_y))
-                        _dbi_count += 1
-            elif actor_type == "vendor":
-                vendor = vendors[idx]
-                _shop_world = vendor.get("shop_pos")
-                _shop_screen = _shop_world - camera if isinstance(_shop_world, Vector2) else None
-                _vb_flag = _vendor_behind_flags[idx] if idx < len(_vendor_behind_flags) else False
-                # Choose render target: screen directly or temp surface for transparency
-                if _vb_flag:
-                    _vt_w, _vt_h = 200, 200
-                    _vt_surf = pygame.Surface((_vt_w, _vt_h), pygame.SRCALPHA)
-                    _vt_cx = int(vendor["pos"].x - camera.x)
-                    _vt_cy = int(vendor["pos"].y - camera.y)
-                    _vt_ox = _vt_cx - _vt_w // 2
-                    _vt_oy = _vt_cy - _vt_h + 20
-                    _vt_offset = Vector2(_vt_ox, _vt_oy)
-                    draw_vendor(
-                        _vt_surf,
-                        vendor["pos"] - camera - _vt_offset,
-                        None,
-                        str(vendor.get("role", "")),
-                        int(vendor["facing"]),
-                        vendor["sprite"], vendor["sprite_left"],
-                        float(vendor.get("anim_timer", vendor.get("idle_time", 0.0))),
-                        anim_frames=vendor.get("anim_frames"),
-                        stand_seed=int(vendor.get("stand_seed", 0)),
-                        ticks=ticks, draw_stand=False,
-                        is_moving=bool(vendor.get("patrol_moving", False)),
-                    )
-                    _vt_alpha = pygame.Surface((_vt_w, _vt_h), pygame.SRCALPHA)
-                    _vt_alpha.fill((255, 255, 255, 120))
-                    _vt_surf.blit(_vt_alpha, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-                    screen.blit(_vt_surf, (int(_vt_ox), int(_vt_oy)))
-                else:
-                    draw_vendor(
-                        screen,
-                        vendor["pos"] - camera,
-                        _shop_screen,
-                        str(vendor.get("role", "")),
-                        int(vendor["facing"]),
-                        vendor["sprite"], vendor["sprite_left"],
-                        float(vendor.get("anim_timer", vendor.get("idle_time", 0.0))),
-                        anim_frames=vendor.get("anim_frames"),
-                        stand_seed=int(vendor.get("stand_seed", 0)),
-                        ticks=ticks, draw_stand=False,
-                        is_moving=bool(vendor.get("patrol_moving", False)),
-                    )
-                # WoW-style nameplate above sprite
-                _vsprite = vendor["sprite"]
-                _vrect = _vsprite.get_rect(midbottom=(int(vendor["pos"].x - camera.x), int(vendor["pos"].y - camera.y) + 1))
-                _vname = str(vendor.get("name", ""))
-                marker = vendor_quest_markers.get(idx, "")
-                _nameplate_top = _vrect.top - 4
-                if _vname:
-                    _vnsurf = npc_name_font.render(_vname, True, (238, 220, 168))
-                    _vnjob  = npc_name_font.render(str(vendor.get("role", "")), True, (168, 196, 220))
-                    _vnw = max(_vnsurf.get_width(), _vnjob.get_width()) + 6
-                    _vnh = _vnsurf.get_height() + _vnjob.get_height() + 4
-                    _vnx = _vrect.centerx - _vnw // 2
-                    _vny = _vrect.top - _vnh - 4
-                    _nameplate_top = _vny
-                    _bg = pygame.Surface((_vnw, _vnh), pygame.SRCALPHA)
-                    _bg.fill((8, 8, 14, 165))
-                    screen.blit(_bg, (_vnx, _vny))
-                    screen.blit(_vnsurf, (_vnx + (_vnw - _vnsurf.get_width()) // 2, _vny + 2))
-                    screen.blit(_vnjob,  (_vnx + (_vnw - _vnjob.get_width())  // 2, _vny + 2 + _vnsurf.get_height() + 1))
-                # Vendor shop icon (floating pouch above nameplate)
-                _icon_bob = int(math.sin(ticks * 0.004 + idx * 1.7) * 2)
-                _icon_x = _vrect.centerx - vendor_shop_icon.get_width() // 2
-                _icon_y = _nameplate_top - vendor_shop_icon.get_height() - 2 + _icon_bob
-                screen.blit(vendor_shop_icon, (_icon_x, _icon_y))
-                if marker:
-                    draw_vendor_quest_marker(
-                        screen,
-                        vendor["pos"] - camera,
-                        int(vendor["facing"]),
-                        vendor["sprite"],
-                        vendor["sprite_left"],
-                        float(vendor.get("idle_time", 0.0)),
-                        marker,
-                        ui_font,
-                        pygame.time.get_ticks(),
-                        highlighted=(active_vendor_idx == idx),
-                        nameplate_top=_nameplate_top,
-                    )
-                if show_level_decor_editor:
-                    vendor_pos = vendor.get("pos")
-                    if isinstance(vendor_pos, Vector2):
-                        anchor = (int(vendor_pos.x - camera.x), int(vendor_pos.y - camera.y - 10))
-                        ring_color = (244, 208, 132) if drag_npc_idx == idx else (118, 224, 232)
-                        pygame.draw.circle(screen, ring_color, anchor, 8 if drag_npc_idx == idx else 6, 2)
-                        if drag_npc_idx == idx:
-                            drag_label = tiny_font.render("Moving", True, (248, 236, 196))
-                            screen.blit(drag_label, (anchor[0] - drag_label.get_width() // 2, anchor[1] - 24))
-            elif actor_type == "farm_animal":
-                _fa_entry = farm_animals[idx]
-                _fa_pos = _fa_entry.get("pos")
-                if isinstance(_fa_pos, Vector2) and (
-                        _fa_pos.x - camera.x < -120 or _fa_pos.x - camera.x > SCREEN_WIDTH + 120 or
-                        _fa_pos.y - camera.y < -120 or _fa_pos.y - camera.y > SCREEN_HEIGHT + 120):
-                    continue
-                draw_farm_animal(screen, _fa_entry, int(camera.x), int(camera.y), ticks)
-            elif actor_type == "wildlife":
-                critter = active_passives()[idx]
-                draw_passive_animal(
-                    screen,
-                    critter["pos"] - camera,
-                    int(critter["facing"]),
-                    critter["sprite"],
-                    critter["sprite_left"],
-                    float(critter.get("hp", 0.0)),
-                    float(critter.get("max_hp", 1.0)),
-                    anim_frames=critter.get("anim_frames"),
-                    anim_timer=float(critter.get("anim_timer", 0.0)),
-                    name=str(critter.get("name", "")),
-                    moving=bool(critter.get("moving", False)),
-                )
-            elif actor_type == "skeleton":
-                summon = summoned_skeletons[idx]
-                summon_pos = summon.get("pos")
-                if isinstance(summon_pos, Vector2):
-                    draw_summoned_skeleton(
-                        screen,
-                        summon_pos - camera,
-                        int(summon.get("facing", 1)),
-                        float(summon.get("life", 0.0)),
-                        float(summon.get("duration", 1.0)),
-                        level=max(1, int(summon.get("level", 1))),
-                        swing=float(summon.get("swing", 0.0)),
-                    )
-            elif actor_type == "fire":
-                if fire_frames:
-                    frame_idx = (pygame.time.get_ticks() // 150) % len(fire_frames)
-                    f = fire_frames[frame_idx]
-                    # Draw centered on the fire pit location (town square, west side)
-                    _fx = int(town_square_fire_pit_pos.x) - f.get_width() // 2 - int(camera.x)
-                    _fy = int(town_square_fire_pit_pos.y) - f.get_height() + 12 - int(camera.y)
-                    screen.blit(f, (_fx, _fy))
-            else:
-                wolf = active_enemies()[idx] # "predator"
-                wolf_fx = status_effects.get_effects(status_effects.wolf_key(wolf))
-                freeze_strength = 0.0
-                _wolf_burn_str = 0.0
-                _wolf_slow_str = 0.0
-                _wolf_stun_str = 0.0
-                for fx in wolf_fx:
-                    if fx.kind == "freeze":
-                        freeze_strength = max(freeze_strength, clamp(float(fx.duration) / 2.4, 0.0, 1.0))
-                    elif fx.kind == "burn":
-                        _wolf_burn_str = max(_wolf_burn_str, clamp(float(fx.duration) / 3.0, 0.0, 1.0))
-                    elif fx.kind == "scorched":
-                        _wolf_burn_str = max(_wolf_burn_str, clamp(float(fx.duration) / 5.0, 0.3, 0.7))
-                    elif fx.kind == "slow":
-                        _wolf_slow_str = max(_wolf_slow_str, clamp(float(fx.potency), 0.0, 1.0))
-                    elif fx.kind == "stun":
-                        _wolf_stun_str = max(_wolf_stun_str, clamp(float(fx.duration) / 1.0, 0.0, 1.0))
-                _wolf_hit_flash_dur = max(0.001, float(wolf.get("hit_flash_duration", 0.14)))
-                _wolf_hit_flash = clamp(float(wolf.get("hit_flash_timer", 0.0)) / _wolf_hit_flash_dur, 0.0, 1.0)
-                _wolf_hit_flash_color_raw = wolf.get("hit_flash_color", (255, 244, 220))
-                _wolf_hit_flash_color = _wolf_hit_flash_color_raw if isinstance(_wolf_hit_flash_color_raw, tuple) and len(_wolf_hit_flash_color_raw) == 3 else (255, 244, 220)
-                draw_wolf(
-                    screen,
-                    wolf["pos"] - camera,
-                    int(wolf["facing"]),
-                    wolf["sprite"],
-                    wolf["sprite_left"],
-                    float(wolf["hp"]),
-                    float(wolf["max_hp"]),
-                    level=int(wolf.get("level", 1)),
-                    selected=(id(wolf) == selected_wolf_id),
-                    attack_state=str(wolf.get("attack_state", "idle")),
-                    attack_visual=float(wolf.get("attack_visual", 0.0)),
-                    engage_role=str(wolf.get("engage_role", "patrol")),
-                    chasing=bool(wolf.get("chasing", False)),
-                    anim_frames=wolf.get("anim_frames"),
-                    anim_timer=float(wolf.get("anim_timer", 0.0)),
-                    frozen=freeze_strength > 0.0,
-                    frozen_strength=freeze_strength,
-                    burn_strength=_wolf_burn_str,
-                    slow_strength=_wolf_slow_str,
-                    stun_strength=_wolf_stun_str,
-                    hit_flash_strength=_wolf_hit_flash,
-                    hit_flash_color=_wolf_hit_flash_color,
-                    dying=bool(wolf.get("dying", False)),
-                    death_progress=(1.0 - clamp(float(wolf.get("death_timer", 0.0)) / max(0.001, float(wolf.get("death_duration", 0.55))), 0.0, 1.0)),
-                )
 
-        # Foreground house overlays (transparent) — draw after actors so roofs can occlude.
-        if current_level == "town" and _town_house_overlays_fg:
-            for _ho_surf, _ho_sx, _ho_sy, _ho_tag in _town_house_overlays_fg:
-                    # Skip church even if tagged (church never fades)
-                    if _ho_tag == "church":
+            # Draw all vendor stands first so shop walls are always behind actors.
+            # Use int(camera) to match the town_surface blit offset and avoid 1px sub-pixel flicker.
+            _vendor_behind_flags: list = []  # per-vendor: True if player is behind this vendor's shop
+            if current_level == "town":
+                _cam_ix, _cam_iy = int(camera.x), int(camera.y)
+                _px, _py = int(player_pos.x), int(player_pos.y)
+                for vendor in vendors:
+                    _shop_world = vendor.get("shop_pos")
+                    if isinstance(_shop_world, Vector2):
+                        _shop_screen = Vector2(_shop_world.x - _cam_ix, _shop_world.y - _cam_iy)
+                    else:
+                        _vpos = vendor["pos"]
+                        _shop_screen = Vector2(_vpos.x - _cam_ix, _vpos.y - _cam_iy)
+                    # Viewport cull: shop stands are large and expensive to draw; skip any
+                    # whose footprint is fully off-screen (generous margin for big buildings).
+                    if (_shop_screen.x < -480 or _shop_screen.x > SCREEN_WIDTH + 480 or
+                            _shop_screen.y < -640 or _shop_screen.y > SCREEN_HEIGHT + 320):
+                        _vendor_behind_flags.append(False)
                         continue
-                    _ho_copy = _ho_surf.copy()
-                    _alpha_surf = pygame.Surface(_ho_copy.get_size(), pygame.SRCALPHA)
-                    _alpha_surf.fill((255, 255, 255, 100))  # ~39% opacity
-                    _ho_copy.blit(_alpha_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-                    screen.blit(_ho_copy, (_ho_sx, _ho_sy))
+                    # Check if player is behind this shop (use both stand and vendor pos)
+                    _sw = _shop_world if isinstance(_shop_world, Vector2) else vendor["pos"]
+                    _vw = vendor["pos"]
+                    _shop_margin = 120
+                    _check_y = min(_sw.y, _vw.y)  # use the furthest-north position
+                    _check_x = (_sw.x + _vw.x) / 2  # midpoint between stand and vendor
+                    _v_behind = (_py < _check_y - 10 and
+                                 _py > _check_y - 250 and
+                                 abs(_px - _check_x) < _shop_margin + 80)
+                    _vendor_behind_flags.append(_v_behind)
+                    if _v_behind:
+                        # Draw stand to temp surface, apply transparency
+                        _vs_w, _vs_h = 700, 700
+                        _vs_tmp = pygame.Surface((_vs_w, _vs_h), pygame.SRCALPHA)
+                        # Position center-bottom of the surface at the shop screen pos
+                        _vs_center = Vector2(_vs_w // 2, _vs_h - 100)
+                        draw_vendor_stand(
+                            _vs_tmp, _vs_center,
+                            str(vendor.get("role", "")).strip().lower(),
+                            ticks, int(vendor.get("stand_seed", 0)),
+                            rotation=float(vendor.get("shop_rotation", 0.0)),
+                        )
+                        _vs_alpha = pygame.Surface((_vs_w, _vs_h), pygame.SRCALPHA)
+                        _vs_alpha.fill((255, 255, 255, 120))
+                        _vs_tmp.blit(_vs_alpha, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+                        screen.blit(_vs_tmp, (int(_shop_screen.x) - _vs_w // 2,
+                                              int(_shop_screen.y) - _vs_h + 100))
+                    else:
+                        draw_vendor_stand(
+                            screen, _shop_screen,
+                            str(vendor.get("role", "")).strip().lower(),
+                            ticks, int(vendor.get("stand_seed", 0)),
+                            rotation=float(vendor.get("shop_rotation", 0.0)),
+                        )
 
-        for decor_index in overlay_decor_indices:
-            if 0 <= decor_index < len(current_level_decor):
-                decor_entry = current_level_decor[decor_index]
-                if isinstance(decor_entry, dict):
-                    draw_level_decor_instance(
+            for _, actor_type, idx in actors:
+                if actor_type == "decor":
+                    if 0 <= idx < len(current_level_decor):
+                        decor_entry = current_level_decor[idx]
+                        if isinstance(decor_entry, dict):
+                            draw_level_decor_instance(
+                                screen,
+                                decor_entry,
+                                level_decor_assets,
+                                level_decor_render_cache,
+                                camera,
+                            )
+                elif actor_type == "player":
+                    player_draw_state = "run" if (moving and speed_boost_timer > 0.0) else ("walk" if moving else "idle")
+                    player_draw_timer = player_anim_timer
+                    if player_hurt_anim_state:
+                        player_draw_state = player_hurt_anim_state
+                        player_draw_timer = player_hurt_anim_elapsed
+                    elif player_attack_anim_state:
+                        player_draw_state = player_attack_anim_state
+                        player_draw_timer = player_attack_anim_elapsed
+                    draw_player(
                         screen,
+                        player_pos - camera,
+                        facing,
+                        player_sprite,
+                        player_sprite_left,
+                        is_moving=moving,
+                        anim_timer=player_draw_timer,
+                        anim_frames=player_anim_frames,
+                        anim_state=player_draw_state,
+                        anim_direction=player_anim_direction,
+                        anim_fps=player_anim_fps,
+                        equip_tint_right=player_equip_tint,
+                        equip_tint_left=player_equip_tint_left,
+                        hit_flash_strength=clamp(player_hit_flash_timer / max(0.01, player_hit_flash_duration), 0.0, 1.0),
+                    )
+                    # ── Glowing contour when player is behind a house ──
+                    if _player_behind_house and current_level == "town":
+                        _cs = get_facing_sprite(facing, player_sprite, player_sprite_left)
+                        if _cs is not None:
+                            _cw, _ch = _cs.get_size()
+                            _cp = _cs.get_rect(midbottom=(int(player_pos.x - camera.x), int(player_pos.y - camera.y) + 1))
+                            _outline_pad = 3
+                            _ol_w = _cw + _outline_pad * 2
+                            _ol_h = _ch + _outline_pad * 2
+                            _ol_surf = pygame.Surface((_ol_w, _ol_h), pygame.SRCALPHA)
+                            # Create colored silhouette using pygame.mask
+                            _spr_mask = pygame.mask.from_surface(_cs, 50)
+                            _sil = _spr_mask.to_surface(setcolor=(220, 200, 140, 255), unsetcolor=(0, 0, 0, 0))
+                            # Stamp silhouette at 8 offsets to form outline
+                            for _odx, _ody in [(-1,0),(1,0),(0,-1),(0,1),(-1,-1),(1,-1),(-1,1),(1,1)]:
+                                _ol_surf.blit(_sil, (_outline_pad + _odx * 2, _outline_pad + _ody * 2))
+                            # Cut out center so only border remains
+                            _erase = _spr_mask.to_surface(setcolor=(255, 255, 255, 255), unsetcolor=(0, 0, 0, 0))
+                            _ol_surf.blit(_erase, (_outline_pad, _outline_pad), special_flags=pygame.BLEND_RGBA_SUB)
+                            # Pulse alpha
+                            _ol_alpha = int(160 + 60 * math.sin(ticks * 0.006))
+                            _ol_surf.set_alpha(_ol_alpha)
+                            screen.blit(_ol_surf, (_cp.x - _outline_pad, _cp.y - _outline_pad))
+                    # ── Debuff icons above player head (from sprite sheet) ──
+                    _p_fx = status_effects.get_effects(StatusEffectSystem.PLAYER_KEY)
+                    if _p_fx:
+                        _DEBUFF_SHEET = "assets/items food everything.png"
+                        _DEBUFF_ICON_MAP = {
+                            "bite": (16, 4),   # red claw scratch — row 16, col 4
+                            "fear": (46, 0),   # purple swirl — row 46, col 0
+                        }
+                        _dbi_size = 28
+                        _dbi_count = 0
+                        _px_scr = int(player_pos.x - camera.x)
+                        _py_scr = int(player_pos.y - camera.y) - 68  # above head
+                        for _dfx in _p_fx:
+                            _dbi_rc = _DEBUFF_ICON_MAP.get(_dfx.kind)
+                            if _dbi_rc is None:
+                                continue
+                            _dbi_icon = load_arbitrary_sheet_icon(
+                                _DEBUFF_SHEET, _dbi_rc[0], _dbi_rc[1],
+                                tile_size=64, size=_dbi_size,
+                            )
+                            if _dbi_icon is None:
+                                continue
+                            _dbi_x = _px_scr - (_dbi_size // 2) + _dbi_count * (_dbi_size + 4) - ((_dbi_size + 4) * min(len(_p_fx), 3) // 2) + (_dbi_size + 4) // 2
+                            _dbi_y = _py_scr + int(math.sin(pygame.time.get_ticks() * 0.004 + _dbi_count * 1.2) * 3)
+                            # Pulsing alpha based on remaining duration
+                            _dbi_alpha = max(120, min(255, int(180 + 75 * math.sin(pygame.time.get_ticks() * 0.008 + _dbi_count))))
+                            _dbi_copy = _dbi_icon.copy()
+                            _dbi_copy.set_alpha(_dbi_alpha)
+                            screen.blit(_dbi_copy, (_dbi_x, _dbi_y))
+                            _dbi_count += 1
+                elif actor_type == "vendor":
+                    vendor = vendors[idx]
+                    _shop_world = vendor.get("shop_pos")
+                    _shop_screen = _shop_world - camera if isinstance(_shop_world, Vector2) else None
+                    _vb_flag = _vendor_behind_flags[idx] if idx < len(_vendor_behind_flags) else False
+                    # Choose render target: screen directly or temp surface for transparency
+                    if _vb_flag:
+                        _vt_w, _vt_h = 200, 200
+                        _vt_surf = pygame.Surface((_vt_w, _vt_h), pygame.SRCALPHA)
+                        _vt_cx = int(vendor["pos"].x - camera.x)
+                        _vt_cy = int(vendor["pos"].y - camera.y)
+                        _vt_ox = _vt_cx - _vt_w // 2
+                        _vt_oy = _vt_cy - _vt_h + 20
+                        _vt_offset = Vector2(_vt_ox, _vt_oy)
+                        draw_vendor(
+                            _vt_surf,
+                            vendor["pos"] - camera - _vt_offset,
+                            None,
+                            str(vendor.get("role", "")),
+                            int(vendor["facing"]),
+                            vendor["sprite"], vendor["sprite_left"],
+                            float(vendor.get("anim_timer", vendor.get("idle_time", 0.0))),
+                            anim_frames=vendor.get("anim_frames"),
+                            stand_seed=int(vendor.get("stand_seed", 0)),
+                            ticks=ticks, draw_stand=False,
+                            is_moving=bool(vendor.get("patrol_moving", False)),
+                        )
+                        _vt_alpha = pygame.Surface((_vt_w, _vt_h), pygame.SRCALPHA)
+                        _vt_alpha.fill((255, 255, 255, 120))
+                        _vt_surf.blit(_vt_alpha, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+                        screen.blit(_vt_surf, (int(_vt_ox), int(_vt_oy)))
+                    else:
+                        draw_vendor(
+                            screen,
+                            vendor["pos"] - camera,
+                            _shop_screen,
+                            str(vendor.get("role", "")),
+                            int(vendor["facing"]),
+                            vendor["sprite"], vendor["sprite_left"],
+                            float(vendor.get("anim_timer", vendor.get("idle_time", 0.0))),
+                            anim_frames=vendor.get("anim_frames"),
+                            stand_seed=int(vendor.get("stand_seed", 0)),
+                            ticks=ticks, draw_stand=False,
+                            is_moving=bool(vendor.get("patrol_moving", False)),
+                        )
+                    # WoW-style nameplate above sprite
+                    _vsprite = vendor["sprite"]
+                    _vrect = _vsprite.get_rect(midbottom=(int(vendor["pos"].x - camera.x), int(vendor["pos"].y - camera.y) + 1))
+                    _vname = str(vendor.get("name", ""))
+                    marker = vendor_quest_markers.get(idx, "")
+                    _nameplate_top = _vrect.top - 4
+                    if _vname:
+                        _vnsurf = npc_name_font.render(_vname, True, (238, 220, 168))
+                        _vnjob  = npc_name_font.render(str(vendor.get("role", "")), True, (168, 196, 220))
+                        _vnw = max(_vnsurf.get_width(), _vnjob.get_width()) + 6
+                        _vnh = _vnsurf.get_height() + _vnjob.get_height() + 4
+                        _vnx = _vrect.centerx - _vnw // 2
+                        _vny = _vrect.top - _vnh - 4
+                        _nameplate_top = _vny
+                        _bg = pygame.Surface((_vnw, _vnh), pygame.SRCALPHA)
+                        _bg.fill((8, 8, 14, 165))
+                        screen.blit(_bg, (_vnx, _vny))
+                        screen.blit(_vnsurf, (_vnx + (_vnw - _vnsurf.get_width()) // 2, _vny + 2))
+                        screen.blit(_vnjob,  (_vnx + (_vnw - _vnjob.get_width())  // 2, _vny + 2 + _vnsurf.get_height() + 1))
+                    # Vendor shop icon (floating pouch above nameplate)
+                    _icon_bob = int(math.sin(ticks * 0.004 + idx * 1.7) * 2)
+                    _icon_x = _vrect.centerx - vendor_shop_icon.get_width() // 2
+                    _icon_y = _nameplate_top - vendor_shop_icon.get_height() - 2 + _icon_bob
+                    screen.blit(vendor_shop_icon, (_icon_x, _icon_y))
+                    if marker:
+                        draw_vendor_quest_marker(
+                            screen,
+                            vendor["pos"] - camera,
+                            int(vendor["facing"]),
+                            vendor["sprite"],
+                            vendor["sprite_left"],
+                            float(vendor.get("idle_time", 0.0)),
+                            marker,
+                            ui_font,
+                            pygame.time.get_ticks(),
+                            highlighted=(active_vendor_idx == idx),
+                            nameplate_top=_nameplate_top,
+                        )
+                    if show_level_decor_editor:
+                        vendor_pos = vendor.get("pos")
+                        if isinstance(vendor_pos, Vector2):
+                            anchor = (int(vendor_pos.x - camera.x), int(vendor_pos.y - camera.y - 10))
+                            ring_color = (244, 208, 132) if drag_npc_idx == idx else (118, 224, 232)
+                            pygame.draw.circle(screen, ring_color, anchor, 8 if drag_npc_idx == idx else 6, 2)
+                            if drag_npc_idx == idx:
+                                drag_label = tiny_font.render("Moving", True, (248, 236, 196))
+                                screen.blit(drag_label, (anchor[0] - drag_label.get_width() // 2, anchor[1] - 24))
+                elif actor_type == "farm_animal":
+                    _fa_entry = farm_animals[idx]
+                    _fa_pos = _fa_entry.get("pos")
+                    if isinstance(_fa_pos, Vector2) and (
+                            _fa_pos.x - camera.x < -120 or _fa_pos.x - camera.x > SCREEN_WIDTH + 120 or
+                            _fa_pos.y - camera.y < -120 or _fa_pos.y - camera.y > SCREEN_HEIGHT + 120):
+                        continue
+                    draw_farm_animal(screen, _fa_entry, int(camera.x), int(camera.y), ticks)
+                elif actor_type == "wildlife":
+                    critter = active_passives()[idx]
+                    draw_passive_animal(
+                        screen,
+                        critter["pos"] - camera,
+                        int(critter["facing"]),
+                        critter["sprite"],
+                        critter["sprite_left"],
+                        float(critter.get("hp", 0.0)),
+                        float(critter.get("max_hp", 1.0)),
+                        anim_frames=critter.get("anim_frames"),
+                        anim_timer=float(critter.get("anim_timer", 0.0)),
+                        name=str(critter.get("name", "")),
+                        moving=bool(critter.get("moving", False)),
+                    )
+                elif actor_type == "skeleton":
+                    summon = summoned_skeletons[idx]
+                    summon_pos = summon.get("pos")
+                    if isinstance(summon_pos, Vector2):
+                        draw_summoned_skeleton(
+                            screen,
+                            summon_pos - camera,
+                            int(summon.get("facing", 1)),
+                            float(summon.get("life", 0.0)),
+                            float(summon.get("duration", 1.0)),
+                            level=max(1, int(summon.get("level", 1))),
+                            swing=float(summon.get("swing", 0.0)),
+                        )
+                elif actor_type == "fire":
+                    if fire_frames:
+                        frame_idx = (pygame.time.get_ticks() // 150) % len(fire_frames)
+                        f = fire_frames[frame_idx]
+                        # Draw centered on the fire pit location (town square, west side)
+                        _fx = int(town_square_fire_pit_pos.x) - f.get_width() // 2 - int(camera.x)
+                        _fy = int(town_square_fire_pit_pos.y) - f.get_height() + 12 - int(camera.y)
+                        screen.blit(f, (_fx, _fy))
+                else:
+                    wolf = active_enemies()[idx] # "predator"
+                    wolf_fx = status_effects.get_effects(status_effects.wolf_key(wolf))
+                    freeze_strength = 0.0
+                    _wolf_burn_str = 0.0
+                    _wolf_slow_str = 0.0
+                    _wolf_stun_str = 0.0
+                    for fx in wolf_fx:
+                        if fx.kind == "freeze":
+                            freeze_strength = max(freeze_strength, clamp(float(fx.duration) / 2.4, 0.0, 1.0))
+                        elif fx.kind == "burn":
+                            _wolf_burn_str = max(_wolf_burn_str, clamp(float(fx.duration) / 3.0, 0.0, 1.0))
+                        elif fx.kind == "scorched":
+                            _wolf_burn_str = max(_wolf_burn_str, clamp(float(fx.duration) / 5.0, 0.3, 0.7))
+                        elif fx.kind == "slow":
+                            _wolf_slow_str = max(_wolf_slow_str, clamp(float(fx.potency), 0.0, 1.0))
+                        elif fx.kind == "stun":
+                            _wolf_stun_str = max(_wolf_stun_str, clamp(float(fx.duration) / 1.0, 0.0, 1.0))
+                    _wolf_hit_flash_dur = max(0.001, float(wolf.get("hit_flash_duration", 0.14)))
+                    _wolf_hit_flash = clamp(float(wolf.get("hit_flash_timer", 0.0)) / _wolf_hit_flash_dur, 0.0, 1.0)
+                    _wolf_hit_flash_color_raw = wolf.get("hit_flash_color", (255, 244, 220))
+                    _wolf_hit_flash_color = _wolf_hit_flash_color_raw if isinstance(_wolf_hit_flash_color_raw, tuple) and len(_wolf_hit_flash_color_raw) == 3 else (255, 244, 220)
+                    draw_wolf(
+                        screen,
+                        wolf["pos"] - camera,
+                        int(wolf["facing"]),
+                        wolf["sprite"],
+                        wolf["sprite_left"],
+                        float(wolf["hp"]),
+                        float(wolf["max_hp"]),
+                        level=int(wolf.get("level", 1)),
+                        selected=(id(wolf) == selected_wolf_id),
+                        attack_state=str(wolf.get("attack_state", "idle")),
+                        attack_visual=float(wolf.get("attack_visual", 0.0)),
+                        engage_role=str(wolf.get("engage_role", "patrol")),
+                        chasing=bool(wolf.get("chasing", False)),
+                        anim_frames=wolf.get("anim_frames"),
+                        anim_timer=float(wolf.get("anim_timer", 0.0)),
+                        frozen=freeze_strength > 0.0,
+                        frozen_strength=freeze_strength,
+                        burn_strength=_wolf_burn_str,
+                        slow_strength=_wolf_slow_str,
+                        stun_strength=_wolf_stun_str,
+                        hit_flash_strength=_wolf_hit_flash,
+                        hit_flash_color=_wolf_hit_flash_color,
+                        dying=bool(wolf.get("dying", False)),
+                        death_progress=(1.0 - clamp(float(wolf.get("death_timer", 0.0)) / max(0.001, float(wolf.get("death_duration", 0.55))), 0.0, 1.0)),
+                    )
+
+            # Foreground house overlays (transparent) — draw after actors so roofs can occlude.
+            if current_level == "town" and _town_house_overlays_fg:
+                for _ho_surf, _ho_sx, _ho_sy, _ho_tag in _town_house_overlays_fg:
+                        # Skip church even if tagged (church never fades)
+                        if _ho_tag == "church":
+                            continue
+                        _ho_copy = _ho_surf.copy()
+                        _alpha_surf = pygame.Surface(_ho_copy.get_size(), pygame.SRCALPHA)
+                        _alpha_surf.fill((255, 255, 255, 100))  # ~39% opacity
+                        _ho_copy.blit(_alpha_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+                        screen.blit(_ho_copy, (_ho_sx, _ho_sy))
+
+            for decor_index in overlay_decor_indices:
+                if 0 <= decor_index < len(current_level_decor):
+                    decor_entry = current_level_decor[decor_index]
+                    if isinstance(decor_entry, dict):
+                        draw_level_decor_instance(
+                            screen,
+                            decor_entry,
+                            level_decor_assets,
+                            level_decor_render_cache,
+                            camera,
+                        )
+
+            if show_level_decor_editor and decor_collision_preview:
+                for decor_entry in current_level_decor:
+                    if not isinstance(decor_entry, dict):
+                        continue
+                    collision_rect = get_level_decor_collision_rect(
                         decor_entry,
                         level_decor_assets,
                         level_decor_render_cache,
                         camera,
                     )
+                    if not isinstance(collision_rect, pygame.Rect):
+                        continue
+                    if not collision_rect.colliderect(pygame.Rect(-60, -60, SCREEN_WIDTH + 120, SCREEN_HEIGHT + 120)):
+                        continue
+                    fill = pygame.Surface((collision_rect.width, collision_rect.height), pygame.SRCALPHA)
+                    fill.fill((82, 198, 204, 48))
+                    screen.blit(fill, collision_rect.topleft)
+                    pygame.draw.rect(screen, (110, 228, 236), collision_rect, 1)
 
-        if show_level_decor_editor and decor_collision_preview:
-            for decor_entry in current_level_decor:
-                if not isinstance(decor_entry, dict):
-                    continue
-                collision_rect = get_level_decor_collision_rect(
-                    decor_entry,
-                    level_decor_assets,
-                    level_decor_render_cache,
-                    camera,
-                )
-                if not isinstance(collision_rect, pygame.Rect):
-                    continue
-                if not collision_rect.colliderect(pygame.Rect(-60, -60, SCREEN_WIDTH + 120, SCREEN_HEIGHT + 120)):
-                    continue
-                fill = pygame.Surface((collision_rect.width, collision_rect.height), pygame.SRCALPHA)
-                fill.fill((82, 198, 204, 48))
-                screen.blit(fill, collision_rect.topleft)
-                pygame.draw.rect(screen, (110, 228, 236), collision_rect, 1)
+            if show_level_decor_editor and decor_selected_asset_id and decor_placement_mode not in ("delete", "move"):
+                placement_rect = pygame.Rect(16, 16, max(220, SCREEN_WIDTH - DECOR_EDITOR_PANEL_WIDTH - 44), SCREEN_HEIGHT - 32)
+                if placement_rect.collidepoint(mouse_pos):
+                    preview_asset = selected_level_decor_asset()
+                    preview_world = Vector2(float(mouse_pos[0] + camera.x), float(mouse_pos[1] + camera.y))
+                    preview_generated = isinstance(preview_asset, dict) and str(preview_asset.get("asset_pack", "")).lower() == "medieval_generated"
+                    if preview_generated or level_decor_asset_uses_tile_brush(preview_asset) or decor_placement_mode == "tile":
+                        preview_world = snap_editor_point_to_grid(preview_world)
+                    preview_entry = {
+                        "asset_id": decor_selected_asset_id,
+                        "x": float(preview_world.x),
+                        "y": float(preview_world.y),
+                        "scale": 1.0 if level_decor_asset_uses_tile_brush(preview_asset) else decor_selected_scale,
+                        "rotation": 0.0 if level_decor_asset_uses_tile_brush(preview_asset) else decor_selected_rotation,
+                    }
+                    draw_level_decor_instance(
+                        screen,
+                        preview_entry,
+                        level_decor_assets,
+                        level_decor_render_cache,
+                        camera,
+                        alpha=158,
+                        highlight=True,
+                        show_anchor=True,
+                    )
 
-        if show_level_decor_editor and decor_selected_asset_id and decor_placement_mode not in ("delete", "move"):
-            placement_rect = pygame.Rect(16, 16, max(220, SCREEN_WIDTH - DECOR_EDITOR_PANEL_WIDTH - 44), SCREEN_HEIGHT - 32)
-            if placement_rect.collidepoint(mouse_pos):
-                preview_asset = selected_level_decor_asset()
-                preview_world = Vector2(float(mouse_pos[0] + camera.x), float(mouse_pos[1] + camera.y))
-                preview_generated = isinstance(preview_asset, dict) and str(preview_asset.get("asset_pack", "")).lower() == "medieval_generated"
-                if preview_generated or level_decor_asset_uses_tile_brush(preview_asset) or decor_placement_mode == "tile":
-                    preview_world = snap_editor_point_to_grid(preview_world)
-                preview_entry = {
-                    "asset_id": decor_selected_asset_id,
-                    "x": float(preview_world.x),
-                    "y": float(preview_world.y),
-                    "scale": 1.0 if level_decor_asset_uses_tile_brush(preview_asset) else decor_selected_scale,
-                    "rotation": 0.0 if level_decor_asset_uses_tile_brush(preview_asset) else decor_selected_rotation,
-                }
+            if show_level_decor_editor and decor_grabbed is not None:
+                _grab_world = Vector2(float(mouse_pos[0] + camera.x), float(mouse_pos[1] + camera.y))
+                _grab_preview = dict(decor_grabbed)
+                _grab_preview["x"] = float(_grab_world.x)
+                _grab_preview["y"] = float(_grab_world.y)
                 draw_level_decor_instance(
                     screen,
-                    preview_entry,
+                    _grab_preview,
                     level_decor_assets,
                     level_decor_render_cache,
                     camera,
-                    alpha=158,
+                    alpha=180,
                     highlight=True,
                     show_anchor=True,
                 )
 
-        if show_level_decor_editor and decor_grabbed is not None:
-            _grab_world = Vector2(float(mouse_pos[0] + camera.x), float(mouse_pos[1] + camera.y))
-            _grab_preview = dict(decor_grabbed)
-            _grab_preview["x"] = float(_grab_world.x)
-            _grab_preview["y"] = float(_grab_world.y)
-            draw_level_decor_instance(
+            if show_level_decor_editor and decor_grab_church and current_level == "town":
+                _ch_screen = Vector2(church_pos.x - camera.x, church_pos.y - camera.y)
+                _ch_preview = pygame.Surface((500, 700), pygame.SRCALPHA)
+                draw_church(_ch_preview, 250, 600)
+                _ch_preview.set_alpha(160)
+                screen.blit(_ch_preview, (int(_ch_screen.x) - 250, int(_ch_screen.y) - 600))
+
+            for ultimate in active_ultimates:
+                ultimate.draw(screen, camera)
+            draw_damage_numbers(screen, damage_numbers, camera, tiny_font)
+            if combat_runtime is not None:
+                combat_runtime.draw_overlay(screen, camera)
+            ambient_overlay.draw(
                 screen,
-                _grab_preview,
-                level_decor_assets,
-                level_decor_render_cache,
-                camera,
-                alpha=180,
-                highlight=True,
-                show_anchor=True,
-            )
-
-        if show_level_decor_editor and decor_grab_church and current_level == "town":
-            _ch_screen = Vector2(church_pos.x - camera.x, church_pos.y - camera.y)
-            _ch_preview = pygame.Surface((500, 700), pygame.SRCALPHA)
-            draw_church(_ch_preview, 250, 600)
-            _ch_preview.set_alpha(160)
-            screen.blit(_ch_preview, (int(_ch_screen.x) - 250, int(_ch_screen.y) - 600))
-
-        for ultimate in active_ultimates:
-            ultimate.draw(screen, camera)
-        draw_damage_numbers(screen, damage_numbers, camera, tiny_font)
-        if combat_runtime is not None:
-            combat_runtime.draw_overlay(screen, camera)
-        ambient_overlay.draw(
-            screen,
-            current_level,
-            weather_system.cloud_cover,
-            weather_system.precipitation,
-            weather_system.fog_density,
-            day_night.time,
-        )
-
-        # Draw point-light glows for town lamps/braziers/fire (before weather overlay)
-        if current_level == "town":
-            night_factor = 0.0
-            _dn_t = day_night.time
-            if _dn_t >= 20.0 or _dn_t < 5.0:
-                night_factor = 1.0
-            elif 18.0 <= _dn_t < 20.0:
-                night_factor = (_dn_t - 18.0) / 2.0
-            elif 5.0 <= _dn_t < 7.0:
-                night_factor = 1.0 - (_dn_t - 5.0) / 2.0
-            if night_factor > 0.02:
-                for _lx, _ly, _lc, _li, _lo, _la in TOWN_LIGHTS:
-                    _sx = _lx - int(camera.x)
-                    _sy = _ly - int(camera.y)
-                    if -_lo <= _sx <= SCREEN_WIDTH + _lo and -_lo <= _sy <= SCREEN_HEIGHT + _lo:
-                        draw_point_light(screen, _sx, _sy, _lc, _li, int(_lo * (0.5 + 0.5 * night_factor)), int(_la * night_factor))
-
-        weather_system.render(screen)
-        screen_effects.draw(screen)
-
-        # ── Fear visual overlay — pulsing purple vignette + screen wobble ──
-        if _player_feared:
-            _fear_alpha = int(48 + 22 * math.sin(pygame.time.get_ticks() * 0.006))
-            _fear_ov = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-            # Dark purple edges (vignette)
-            _fcx, _fcy = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
-            _fmax_r = math.hypot(_fcx, _fcy)
-            for _fri in range(5):
-                _fr = _fmax_r * (0.55 + _fri * 0.12)
-                _fa = min(255, _fear_alpha + _fri * 18)
-                pygame.draw.circle(_fear_ov, (80, 20, 120, _fa), (_fcx, _fcy), int(_fr), width=max(40, int(_fmax_r * 0.12)))
-            screen.blit(_fear_ov, (0, 0))
-            # Subtle screen shake
-            _shake_x = random.randint(-3, 3)
-            _shake_y = random.randint(-2, 2)
-            _shifted = screen.copy()
-            screen.fill((0, 0, 0))
-            screen.blit(_shifted, (_shake_x, _shake_y))
-
-        _lvl_px = (player_pos - camera).x
-        _lvl_py = (player_pos - camera).y
-        level_up_vfx.draw(screen, _lvl_px, _lvl_py, skill_title_font)
-
-        # Adaptive color-grade overlays and atmospheric edge lighting.
-        _grade_hour = day_night.time % 24.0
-        if 6.0 <= _grade_hour < 18.0:
-            _night_grade = 0.0
-        elif 18.0 <= _grade_hour < 20.0:
-            _night_grade = (_grade_hour - 18.0) / 2.0
-        elif 5.0 <= _grade_hour < 7.0:
-            _night_grade = 1.0 - (_grade_hour - 5.0) / 2.0
-        else:
-            _night_grade = 1.0
-        _daylight = clamp(1.0 - abs(_grade_hour - 12.0) / 6.0, 0.0, 1.0)
-        _warm_alpha = int(22.0 * _daylight * (1.0 - clamp(weather_system.cloud_cover * 0.82 + weather_system.precipitation * 0.78, 0.0, 1.0)))
-        if current_level != "ice_biome" and _warm_alpha > 0:
-            warm_grade_overlay.set_alpha(_warm_alpha)
-            screen.blit(warm_grade_overlay, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
-        _cold_alpha = int(
-            clamp(
-                12.0
-                + _night_grade * 22.0  # was 34 — keep night readable (detail stays visible)
-                + weather_system.precipitation * 30.0
-                + weather_system.fog_density * 22.0
-                + (14.0 if current_level == "ice_biome" else 0.0),
-                0.0,
-                88.0,
-            )
-        )
-        if _cold_alpha > 0:
-            cold_grade_overlay.set_alpha(_cold_alpha)
-            screen.blit(cold_grade_overlay, (0, 0))
-
-        # Radial vignette — focuses the eye and frames the scene (cheap polish).
-        screen.blit(gameplay_vignette, (0, 0))
-
-        if current_level == "wilderness":
-            lock_name = ""
-            if selected_wolf_id is not None:
-                for wolf in active_enemies():
-                    if id(wolf) == selected_wolf_id:
-                        lock_name = str(wolf.get("name", "Target"))
-                        break
-            lock_txt = f"  Â·  {lock_name}" if lock_name else ""
-            info = tiny_font.render(
-                f"{active_class['name']}  Â·  Predators {len(active_enemies())}  Â·  Slain {wolves_slain}{lock_txt}",
-                True, (170, 178, 160),
-            )
-            screen.blit(info, (24, 16))
-
-        # Gate VFX (embers, mist, glow — always rendered when in town)
-        if current_level == "town":
-            _draw_gate_vfx(screen, int(town_gate_pos.x), int(town_gate_pos.y),
-                           camera.x, camera.y, pygame.time.get_ticks())
-
-        # Gate tooltip
-        if gate_hovered:
-            gx = int(town_gate_pos.x - camera.x)
-            gy = int(town_gate_pos.y - camera.y)
-            _gl1 = ui_font.render("Town Gate", True, (226, 224, 245))
-            _gl2 = tiny_font.render("[Click] Enter The Wilderness", True, (196, 194, 218))
-            _gtw = max(_gl1.get_width(), _gl2.get_width()) + 18
-            _gth = _gl1.get_height() + _gl2.get_height() + 14
-            _gtr = pygame.Rect(0, 0, _gtw, _gth)
-            _gtr.midbottom = (gx, gy - 100)
-            _gtr.clamp_ip(pygame.Rect(10, 10, SCREEN_WIDTH - 20, SCREEN_HEIGHT - 20))
-            pygame.draw.rect(screen, (14, 14, 22), _gtr, border_radius=8)
-            pygame.draw.rect(screen, (118, 112, 176), _gtr, 1, border_radius=8)
-            screen.blit(_gl1, (_gtr.left + 9, _gtr.top + 5))
-            screen.blit(_gl2, (_gtr.left + 9, _gtr.top + 8 + _gl1.get_height()))
-
-        draw_player_resource_bars(
-            screen,
-            player_hp,
-            player_max_hp,
-            player_mana,
-            player_max_mana,
-            ui_font,
-            tiny_font,
-            gold=player_gold,
-            player_level=player_level,
-            xp=player_xp,
-            xp_to_next=player_xp_next,
-        )
-        # Backpack button (bottom-right, above action belt level)
-        _bp_size = 44
-        _bp_x = SCREEN_WIDTH - _bp_size - 16
-        _bp_y = SCREEN_HEIGHT - _bp_size - 8
-        _backpack_btn_rect = pygame.Rect(_bp_x, _bp_y, _bp_size, _bp_size)
-        _bp_hov = _backpack_btn_rect.collidepoint(pygame.mouse.get_pos())
-        _bp_pressed = _bp_hov and pygame.mouse.get_pressed(3)[0]
-        draw_backpack_button_realistic(
-            screen, _backpack_btn_rect, tiny_font,
-            backpack_count=len(backpack_inventory), backpack_capacity=BACKPACK_SLOT_COUNT,
-            hovered=_bp_hov, pressed=_bp_pressed, ticks=pygame.time.get_ticks(),
-        )
-
-        # ── WoW Target Frame ─────────────────────────────────────────────────
-        if (current_level in ("wilderness", "ice_biome") and selected_wolf_id is not None
-                and not show_world_map and not show_skill_tree and not show_character
-                and not show_crafting and not show_quest_log):
-            for _twolf in active_enemies():
-                if id(_twolf) == selected_wolf_id and float(_twolf.get("hp", 0.0)) > 0.0:
-                    draw_target_frame(
-                        screen,
-                        str(_twolf.get("name", "Target")),
-                        float(_twolf.get("hp", 0.0)),
-                        float(_twolf.get("max_hp", 100.0)),
-                        int(_twolf.get("level", 1)),
-                        tiny_font,
-                    )
-                    break
-
-        # ── WoW Buff Tracker (below player panel) ─────────────────────────────
-        if not show_world_map and not show_skill_tree and not show_character and not show_crafting:
-            draw_buff_tracker(screen, damage_boost_timer, speed_boost_timer, tiny_font)
-
-        selected_target_pos: Optional[Vector2] = None
-        if current_level in ("wilderness", "ice_biome") and selected_wolf_id is not None:
-            for wolf in active_enemies():
-                if id(wolf) == selected_wolf_id and isinstance(wolf.get("pos"), Vector2):
-                    selected_target_pos = Vector2(wolf["pos"])
-                    break
-        map_vendor_positions: List[Vector2] = []
-        if current_level == "town":
-            map_vendor_positions = [Vector2(v["pos"]) for v in vendors if isinstance(v.get("pos"), Vector2)]
-        active_map_cache = world_map_cache_by_level.get(current_level, {})
-        minimap_rect = pygame.Rect(0, 0, 0, 0)
-        tracker_anchor_y = 16
-        if not show_world_map and not show_skill_tree and not show_character and not show_crafting and not show_quest_log and not show_professions and not show_level_decor_editor:
-            minimap_rect = draw_wow_minimap(
-                screen,
-                active_map_cache,
                 current_level,
-                player_pos,
-                facing,
-                None,
-                map_vendor_positions,
-                selected_target_pos,
-                tiny_font,
-                tiny_font,
+                weather_system.cloud_cover,
+                weather_system.precipitation,
+                weather_system.fog_density,
                 day_night.time,
             )
-            tracker_anchor_y = minimap_rect.bottom + 10
-            weather_title = tiny_font.render(f"Weather: {weather_system.get_display_name()}", True, weather_system.get_ui_color())
-            weather_detail = tiny_font.render(weather_system.get_hud_detail(current_level), True, (168, 176, 190))
-            weather_rect = pygame.Rect(
-                minimap_rect.left,
-                minimap_rect.bottom + 8,
-                max(weather_title.get_width(), weather_detail.get_width()) + 18,
-                weather_title.get_height() + weather_detail.get_height() + 14,
-            )
-            weather_rect.clamp_ip(pygame.Rect(8, 8, SCREEN_WIDTH - 16, SCREEN_HEIGHT - 16))
-            draw_ornate_panel(screen, weather_rect)
-            screen.blit(weather_title, (weather_rect.left + 9, weather_rect.top + 5))
-            screen.blit(weather_detail, (weather_rect.left + 9, weather_rect.top + 7 + weather_title.get_height()))
-            tracker_anchor_y = max(tracker_anchor_y, weather_rect.bottom + 10)
 
-        # Active quest tracker (top-right) — compact parchment
-        active_quest_def = next(
-            (q for q in QUEST_DEFINITIONS if quest_states.get(q["id"]) in ("active", "complete")),
-            None,
-        )
-        qt_x = SCREEN_WIDTH - 260
-        qt_y = tracker_anchor_y
-        if active_quest_def:
-            qid = active_quest_def["id"]
-            prog = quest_progress.get(qid, [0] * len(active_quest_def["objectives"]))
-            is_complete = quest_states.get(qid) == "complete"
-            num_obj = len(active_quest_def["objectives"])
-            qt_h = 28 + num_obj * 18 + (16 if is_complete else 0)
-            qt_w = 248
-            qt_panel = pygame.Rect(qt_x - 6, qt_y - 3, qt_w, qt_h)
-            # Bright parchment bg
-            _parch = _make_parchment(qt_w, qt_h)
-            screen.blit(_parch, qt_panel.topleft)
-            pygame.draw.rect(screen, (120, 90, 40), qt_panel, 1, border_radius=2)
-            # Title in dark ink
-            _qt_title = tiny_font.render(active_quest_def["title"], True, (35, 20, 5))
-            screen.blit(_qt_title, (qt_x, qt_y))
-            _div_y = qt_y + _qt_title.get_height() + 1
-            pygame.draw.line(screen, (150, 120, 60), (qt_x, _div_y), (qt_x + qt_w - 16, _div_y), 1)
-            _oy = _div_y + 3
-            for i, obj in enumerate(active_quest_def["objectives"]):
-                cur = min(prog[i] if i < len(prog) else 0, obj["count"])
-                tgt = obj["count"]
-                done = cur >= tgt
-                lbl = obj["label"].split("(")[0].strip()
-                _lbl_col = (30, 120, 30) if done else (55, 35, 10)
-                _obj_s = tiny_font.render(f"- {lbl}  ({cur}/{tgt})", True, _lbl_col)
-                screen.blit(_obj_s, (qt_x + 2, _oy))
-                _oy += 18
-            if is_complete:
-                _ready_s = tiny_font.render("READY -- [J] Turn In", True, (160, 45, 30))
-                screen.blit(_ready_s, (qt_x + (qt_w - 16 - _ready_s.get_width()) // 2, _oy))
-            qt_y += qt_panel.height + 4
+            # Draw point-light glows for town lamps/braziers/fire (before weather overlay)
+            if current_level == "town":
+                night_factor = 0.0
+                _dn_t = day_night.time
+                if _dn_t >= 20.0 or _dn_t < 5.0:
+                    night_factor = 1.0
+                elif 18.0 <= _dn_t < 20.0:
+                    night_factor = (_dn_t - 18.0) / 2.0
+                elif 5.0 <= _dn_t < 7.0:
+                    night_factor = 1.0 - (_dn_t - 5.0) / 2.0
+                if night_factor > 0.02:
+                    for _lx, _ly, _lc, _li, _lo, _la in TOWN_LIGHTS:
+                        _sx = _lx - int(camera.x)
+                        _sy = _ly - int(camera.y)
+                        if -_lo <= _sx <= SCREEN_WIDTH + _lo and -_lo <= _sy <= SCREEN_HEIGHT + _lo:
+                            draw_point_light(screen, _sx, _sy, _lc, _li, int(_lo * (0.5 + 0.5 * night_factor)), int(_la * night_factor))
 
-        # Buff indicators
-        buff_y = qt_y
-        for buff_label, timer, col in [
-            (f"DMG +35%  {int(damage_boost_timer)}s", damage_boost_timer, (255, 200, 80)),
-            (f"SPD +28%  {int(speed_boost_timer)}s",  speed_boost_timer,  (120, 210, 240)),
-        ]:
-            if timer > 0.0:
-                bs = tiny_font.render(buff_label, True, col)
-                bx = SCREEN_WIDTH - bs.get_width() - 16
-                pygame.draw.rect(screen, (22, 20, 14), pygame.Rect(bx - 6, buff_y - 2, bs.get_width() + 12, 22), border_radius=6)
-                screen.blit(bs, (bx, buff_y))
-                buff_y += 26
+            weather_system.render(screen)
+            screen_effects.draw(screen)
 
-        # ── POI Discovery Banner (top-center) ──
-        if poi_active and poi_fade_alpha > 0.1 and poi_world_pos is not None:
-            _poi_alpha = int(min(255, poi_fade_alpha))
-            _poi_title_s = ui_font.render(poi_name, True, (255, 230, 170))
-            _poi_desc_s = tiny_font.render(poi_desc, True, (200, 190, 160))
-            _poi_bw = max(_poi_title_s.get_width(), _poi_desc_s.get_width()) + 60
-            _poi_bh = _poi_title_s.get_height() + _poi_desc_s.get_height() + 22
-            _poi_bx = (SCREEN_WIDTH - _poi_bw) // 2
-            _poi_by = 18
-            _poi_panel = pygame.Surface((_poi_bw, _poi_bh), pygame.SRCALPHA)
-            # Dark parchment background
-            pygame.draw.rect(_poi_panel, (18, 14, 10, _poi_alpha), (0, 0, _poi_bw, _poi_bh), border_radius=8)
-            pygame.draw.rect(_poi_panel, (160, 120, 50, _poi_alpha), (0, 0, _poi_bw, _poi_bh), 2, border_radius=8)
-            # Gold accent lines
-            pygame.draw.line(_poi_panel, (180, 140, 60, _poi_alpha), (10, _poi_bh - 6), (_poi_bw - 10, _poi_bh - 6), 1)
-            pygame.draw.line(_poi_panel, (180, 140, 60, _poi_alpha), (10, 5), (_poi_bw - 10, 5), 1)
-            # Compass marker icon (small diamond)
-            _dm_cx = 20
-            _dm_cy = _poi_bh // 2
-            pygame.draw.polygon(_poi_panel, (220, 180, 60, _poi_alpha),
-                                [(_dm_cx, _dm_cy - 8), (_dm_cx + 6, _dm_cy), (_dm_cx, _dm_cy + 8), (_dm_cx - 6, _dm_cy)])
-            # Text
-            _poi_title_s.set_alpha(_poi_alpha)
-            _poi_desc_s.set_alpha(_poi_alpha)
-            _poi_panel.blit(_poi_title_s, (36, 8))
-            _poi_panel.blit(_poi_desc_s, (36, 10 + _poi_title_s.get_height()))
-            screen.blit(_poi_panel, (_poi_bx, _poi_by))
-            # Directional arrow pointing toward POI on screen edge
-            _poi_sx = poi_world_pos.x - camera.x
-            _poi_sy = poi_world_pos.y - camera.y
-            _poi_on_screen = 40 < _poi_sx < SCREEN_WIDTH - 40 and 40 < _poi_sy < SCREEN_HEIGHT - 40
-            if not _poi_on_screen:
-                # Clamp to screen edge and draw arrow
-                _arr_x = max(30, min(SCREEN_WIDTH - 30, _poi_sx))
-                _arr_y = max(_poi_by + _poi_bh + 20, min(SCREEN_HEIGHT - 50, _poi_sy))
-                _arr_dx = poi_world_pos.x - (player_pos.x)
-                _arr_dy = poi_world_pos.y - (player_pos.y)
-                _arr_len = max(1.0, math.sqrt(_arr_dx * _arr_dx + _arr_dy * _arr_dy))
-                _arr_nx = _arr_dx / _arr_len
-                _arr_ny = _arr_dy / _arr_len
-                _arr_sz = 12
-                _tip_x = int(_arr_x + _arr_nx * _arr_sz)
-                _tip_y = int(_arr_y + _arr_ny * _arr_sz)
-                _l_x = int(_arr_x - _arr_ny * _arr_sz * 0.5 - _arr_nx * _arr_sz * 0.3)
-                _l_y = int(_arr_y + _arr_nx * _arr_sz * 0.5 - _arr_ny * _arr_sz * 0.3)
-                _r_x = int(_arr_x + _arr_ny * _arr_sz * 0.5 - _arr_nx * _arr_sz * 0.3)
-                _r_y = int(_arr_y - _arr_nx * _arr_sz * 0.5 - _arr_ny * _arr_sz * 0.3)
-                _acol = (220, 180, 60, _poi_alpha)
-                _arr_surf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-                pygame.draw.polygon(_arr_surf, _acol, [(_tip_x, _tip_y), (_l_x, _l_y), (_r_x, _r_y)])
-                pygame.draw.circle(_arr_surf, _acol, (int(_arr_x), int(_arr_y)), 4)
-                screen.blit(_arr_surf, (0, 0))
+            # ── Fear visual overlay — pulsing purple vignette + screen wobble ──
+            if _player_feared:
+                _fear_alpha = int(48 + 22 * math.sin(pygame.time.get_ticks() * 0.006))
+                _fear_ov = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+                # Dark purple edges (vignette)
+                _fcx, _fcy = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+                _fmax_r = math.hypot(_fcx, _fcy)
+                for _fri in range(5):
+                    _fr = _fmax_r * (0.55 + _fri * 0.12)
+                    _fa = min(255, _fear_alpha + _fri * 18)
+                    pygame.draw.circle(_fear_ov, (80, 20, 120, _fa), (_fcx, _fcy), int(_fr), width=max(40, int(_fmax_r * 0.12)))
+                screen.blit(_fear_ov, (0, 0))
+                # Subtle screen shake
+                _shake_x = random.randint(-3, 3)
+                _shake_y = random.randint(-2, 2)
+                _shifted = screen.copy()
+                screen.fill((0, 0, 0))
+                screen.blit(_shifted, (_shake_x, _shake_y))
 
-        # Player status effect icons (debuffs/buffs from combat)
-        _EFFECT_ICONS: Dict[str, Tuple[Tuple[int,int,int], str]] = {
-            "burn":    ((255, 100, 30),  "BURN"),
-            "freeze":  ((80,  200, 255), "FRZE"),
-            "slow":    ((130, 160, 220), "SLOW"),
-            "stun":    ((240, 220, 60),  "STUN"),
-            "shield":  ((220, 195, 80),  "SHLD"),
-            "bleed":   ((210, 60,  80),  "BLEED"),
-            "bite":    ((200, 80,  50),  "BITE"),
-            "fear":    ((160, 60, 200),  "FEAR"),
-        }
-        _player_fx = status_effects.get_effects(StatusEffectSystem.PLAYER_KEY)
-        if _player_fx:
-            _fx_icon_size = 30
-            # Position below minimap (WoW-style)
-            _minimap_right = SCREEN_WIDTH - 18
-            _minimap_bottom = 16 + 216 + 6  # frame_size=216, gap
-            _fx_x = _minimap_right
-            _fx_y = _minimap_bottom
-            for _fx in _player_fx:
-                _fx_col, _fx_lbl = _EFFECT_ICONS.get(_fx.kind, ((200, 200, 200), _fx.kind[:4].upper()))
-                _fx_x -= _fx_icon_size + 4  # right-aligned, grow leftward
-                # Icon background
-                _fx_surf = pygame.Surface((_fx_icon_size, _fx_icon_size), pygame.SRCALPHA)
-                pygame.draw.rect(_fx_surf, (12, 10, 16, 210), _fx_surf.get_rect(), border_radius=6)
-                # Colored border — thicker for hostile debuffs
-                _border_w = 2 if _fx.kind in ("shield",) else 2
-                pygame.draw.rect(_fx_surf, (*_fx_col, 200), _fx_surf.get_rect(), _border_w, border_radius=6)
-                # Fill sweep (clockwise drain visual — approximated as bottom-up fill)
-                _fx_fill = clamp(_fx.duration / max(0.1, _fx.duration + 0.5), 0.0, 1.0)
-                _fill_h = int((_fx_icon_size - 4) * _fx_fill)
-                if _fill_h > 0:
-                    _fill_s = pygame.Surface((_fx_icon_size - 4, _fill_h), pygame.SRCALPHA)
-                    _fill_s.fill((*_fx_col, 50))
-                    _fx_surf.blit(_fill_s, (2, _fx_icon_size - _fill_h - 2))
-                # Icon symbol
-                _lbl_s = tiny_font.render(_fx_lbl, True, _fx_col)
-                _fx_surf.blit(_lbl_s, (_fx_icon_size // 2 - _lbl_s.get_width() // 2,
-                                        _fx_icon_size // 2 - _lbl_s.get_height() // 2 - 1))
-                screen.blit(_fx_surf, (_fx_x, _fx_y))
-                # Duration text below
-                _dur_s = tiny_font.render(f"{_fx.duration:.0f}s", True, (180, 180, 180))
-                screen.blit(_dur_s, (_fx_x + _fx_icon_size // 2 - _dur_s.get_width() // 2,
-                                      _fx_y + _fx_icon_size + 1))
+            _lvl_px = (player_pos - camera).x
+            _lvl_py = (player_pos - camera).y
+            level_up_vfx.draw(screen, _lvl_px, _lvl_py, skill_title_font)
 
-        if npc_menu_mode != "" and active_vendor_idx is not None and current_level == "town" and 0 <= active_vendor_idx < len(vendors):
-            vendor = vendors[active_vendor_idx]
-            dialog = active_vendor_line if active_vendor_line else str(vendor.get("line", ""))
-            draw_npc_menu(
-                screen,
-                vendor,
-                npc_menu_mode,
-                active_dialogue,
-                dialog,
-                quest_states,
-                QUEST_DEFINITIONS,
-                npc_option_rects,
-                dialog_name_font,
-                dialog_text_font,
-                tiny_font,
-            )
-
-        # Shop panel (shown when shop_open is set)
-        if shop_open and shop_open in VENDOR_SHOPS:
-            shop_items = VENDOR_SHOPS[shop_open]
-            sp_panel = pygame.Rect(SCREEN_WIDTH - 340, SCREEN_HEIGHT - 280, 316, 44 + len(shop_items) * 46)
-            draw_ornate_panel(screen, sp_panel)
-            title_s = dialog_name_font.render(f"{shop_open} Shop  (Gold: {player_gold}g)", True, (200, 230, 160))
-            screen.blit(title_s, (sp_panel.left + 12, sp_panel.top + 10))
-            for si, sitem in enumerate(shop_items):
-                row_y = sp_panel.top + 44 + si * 46
-                key_s = tiny_font.render(f"[{si + 1}]", True, (220, 196, 100))
-                name_s = dialog_text_font.render(f"{sitem['name']} — {sitem['desc']}", True, (228, 228, 228))
-                cost_s = tiny_font.render(f"{sitem['cost']}g", True, (220, 196, 100))
-                screen.blit(key_s, (sp_panel.left + 12, row_y))
-                screen.blit(name_s, (sp_panel.left + 44, row_y))
-                screen.blit(cost_s, (sp_panel.right - cost_s.get_width() - 12, row_y))
-                pygame.draw.line(screen, (60, 60, 70), (sp_panel.left + 10, row_y + 38), (sp_panel.right - 10, row_y + 38))
-
-        # Potion shared-cooldown percentage for radial overlay (used inside unified bar)
-        _potion_cd_elapsed = (pygame.time.get_ticks() - potion_last_used_ms) / 1000.0
-        _potion_cd_pct = max(0.0, 1.0 - _potion_cd_elapsed / 0.35) if potion_last_used_ms > 0 else 0.0
-        _spell_bar_slot_rects, potion_slot_rects = draw_spell_bar(
-            screen, active_spellbook, spell_icons, cooldowns, unlocked_skills,
-            player_mana, selected_spell_idx, tiny_font, ui_font,
-            class_id=selected_class,
-            max_mana=player_max_mana,
-            spell_global_cooldown=spell_global_cooldown,
-            global_cd_max=GLOBAL_SPELL_COOLDOWN,
-            keybinds=spell_slot_keybinds,
-            keybind_editing=keybind_editing_slot,
-            hp=player_hp,
-            max_hp=player_max_hp + bonus_max_hp,
-            gold=player_gold,
-            player_level=player_level,
-            xp=player_xp,
-            xp_to_next=player_xp_next,
-            item_inventory=item_inventory,
-            potion_shared_cd_pct=_potion_cd_pct,
-        )
-        # WoW-style vertical secondary action bar (right side)
-        if not show_spellbook and not show_character and not show_skill_tree:
-            draw_spell_bar_vertical(
-                screen, full_class_spellbook, active_spellbook,
-                spell_icons, cooldowns, unlocked_skills,
-                player_mana, tiny_font, class_id=selected_class,
-            )
-        draw_loot_windows_ui()
-
-        # ── WoW Spellbook Overlay ─────────────────────────────────────────────
-        if show_spellbook and not show_world_map and not perk_choice_pending:
-            _sb_rects = draw_spellbook_overlay(
-                screen, full_class_spellbook, spell_icons, unlocked_skills,
-                spellbook_tab, selected_class, tiny_font, ui_font, dialog_name_font,
-            )
-            # Handle tab clicks via mouse (checked each frame while overlay is open)
-            _sb_mouse = pygame.mouse.get_pos()
-            _sb_clicked = pygame.mouse.get_pressed(3)[0]
-            if _sb_clicked:
-                for _tab_key in ("tab_class", "tab_passive", "tab_general"):
-                    if _tab_key in _sb_rects and _sb_rects[_tab_key].collidepoint(_sb_mouse):
-                        spellbook_tab = _tab_key[4:]   # strip "tab_" prefix
-
-        # Fishing minigame HUD
-        if fishing_active:
-            _fb_w = 340
-            _fb_h = 28
-            _fb_x = SCREEN_WIDTH // 2 - _fb_w // 2
-            _fb_y = SCREEN_HEIGHT - 210
-            # Background bar
-            pygame.draw.rect(screen, (14, 12, 20), pygame.Rect(_fb_x - 2, _fb_y - 2, _fb_w + 4, _fb_h + 4), border_radius=8)
-            pygame.draw.rect(screen, (30, 28, 40), pygame.Rect(_fb_x, _fb_y, _fb_w, _fb_h), border_radius=6)
-            # Catch zone (green)
-            _cz_x = _fb_x + int(fishing_catch_zone * _fb_w)
-            _cz_w = int(0.22 * _fb_w)
-            pygame.draw.rect(screen, (60, 200, 100), pygame.Rect(_cz_x, _fb_y, _cz_w, _fb_h), border_radius=4)
-            # Moving bar (white indicator)
-            _bar_ix = _fb_x + int(fishing_bar_pos * _fb_w) - 4
-            pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(_bar_ix, _fb_y - 2, 8, _fb_h + 4), border_radius=3)
-            # Border
-            pygame.draw.rect(screen, (140, 200, 240), pygame.Rect(_fb_x - 2, _fb_y - 2, _fb_w + 4, _fb_h + 4), 2, border_radius=8)
-            # Timer label
-            _ft_s = tiny_font.render(f"FISHING  [{fishing_timer:.1f}s]  SPACE to catch!", True, (200, 240, 255))
-            screen.blit(_ft_s, (_fb_x + _fb_w // 2 - _ft_s.get_width() // 2, _fb_y - 22))
-        elif fishing_result_timer > 0.0:
-            _fr_col = (80, 220, 120) if fishing_result == "success" else (220, 80, 80)
-            _fr_txt = tiny_font.render("Caught!" if fishing_result == "success" else "Missed!", True, _fr_col)
-            _fr_alpha = int(255 * min(1.0, fishing_result_timer / 0.6))
-            _fr_surf = pygame.Surface((_fr_txt.get_width(), _fr_txt.get_height()), pygame.SRCALPHA)
-            _fr_surf.blit(_fr_txt, (0, 0)); _fr_surf.set_alpha(_fr_alpha)
-            screen.blit(_fr_surf, (SCREEN_WIDTH // 2 - _fr_txt.get_width() // 2, SCREEN_HEIGHT - 220))
-
-        # Near fish rack prompt
-        if current_level == "ice_biome" and not fishing_active and not perk_choice_pending:
-            _fish_rack_pos2 = Vector2(2768, 1478)
-            if player_pos.distance_to(_fish_rack_pos2) <= 180:
-                _fp_s = tiny_font.render("[F] Fish at the rack", True, (160, 220, 240))
-                screen.blit(_fp_s, (SCREEN_WIDTH // 2 - _fp_s.get_width() // 2, SCREEN_HEIGHT - 170))
-
-        if status_timer > 0.0 and status_line:
-            _st = pygame.time.get_ticks()
-            _fade = clamp(status_timer / 0.55, 0.0, 1.0)   # fade-out over last 0.55s
-            _alpha = int(_fade * 255)
-
-            # Pick accent colour by message content
-            _sl = status_line.lower()
-            if any(w in _sl for w in ("looted", "gold", "material", "wolf")):
-                _accent = (210, 175, 72)   # gold
-            elif any(w in _sl for w in ("+hp", "hp.", "health", "restored")):
-                _accent = (190, 72, 72)    # red
-            elif any(w in _sl for w in ("+mp", "mp.", "mana")):
-                _accent = (72, 130, 220)   # blue
-            elif any(w in _sl for w in ("damage", "speed", "+20%", "+28%", "+35%")):
-                _accent = (220, 140, 60)   # orange
-            elif any(w in _sl for w in ("quest", "turned in", "complete")):
-                _accent = (120, 220, 120)  # green
-            elif any(w in _sl for w in ("skill", "level up", "unlocked")):
-                _accent = (170, 110, 240)  # purple
+            # Adaptive color-grade overlays and atmospheric edge lighting.
+            _grade_hour = day_night.time % 24.0
+            if 6.0 <= _grade_hour < 18.0:
+                _night_grade = 0.0
+            elif 18.0 <= _grade_hour < 20.0:
+                _night_grade = (_grade_hour - 18.0) / 2.0
+            elif 5.0 <= _grade_hour < 7.0:
+                _night_grade = 1.0 - (_grade_hour - 5.0) / 2.0
             else:
-                _accent = (180, 170, 150)  # neutral
+                _night_grade = 1.0
+            _daylight = clamp(1.0 - abs(_grade_hour - 12.0) / 6.0, 0.0, 1.0)
+            _warm_alpha = int(22.0 * _daylight * (1.0 - clamp(weather_system.cloud_cover * 0.82 + weather_system.precipitation * 0.78, 0.0, 1.0)))
+            if current_level != "ice_biome" and _warm_alpha > 0:
+                warm_grade_overlay.set_alpha(_warm_alpha)
+                screen.blit(warm_grade_overlay, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
+            _cold_alpha = int(
+                clamp(
+                    12.0
+                    + _night_grade * 22.0  # was 34 — keep night readable (detail stays visible)
+                    + weather_system.precipitation * 30.0
+                    + weather_system.fog_density * 22.0
+                    + (14.0 if current_level == "ice_biome" else 0.0),
+                    0.0,
+                    88.0,
+                )
+            )
+            if _cold_alpha > 0:
+                cold_grade_overlay.set_alpha(_cold_alpha)
+                screen.blit(cold_grade_overlay, (0, 0))
 
-            _txt_surf = ui_font.render(status_line, True, (240, 236, 224))
-            _pw = max(280, _txt_surf.get_width() + 60)
-            _ph = 28
-            _px = SCREEN_WIDTH // 2 - _pw // 2
-            _py = 6
+            # Radial vignette — focuses the eye and frames the scene (cheap polish).
+            screen.blit(gameplay_vignette, (0, 0))
 
-            # Background
-            _bg = pygame.Surface((_pw, _ph), pygame.SRCALPHA)
-            pygame.draw.rect(_bg, (8, 7, 12, int(210 * _fade)), _bg.get_rect(), border_radius=10)
-            screen.blit(_bg, (_px, _py))
+            if current_level == "wilderness":
+                lock_name = ""
+                if selected_wolf_id is not None:
+                    for wolf in active_enemies():
+                        if id(wolf) == selected_wolf_id:
+                            lock_name = str(wolf.get("name", "Target"))
+                            break
+                lock_txt = f"  Â·  {lock_name}" if lock_name else ""
+                info = tiny_font.render(
+                    f"{active_class['name']}  Â·  Predators {len(active_enemies())}  Â·  Slain {wolves_slain}{lock_txt}",
+                    True, (170, 178, 160),
+                )
+                screen.blit(info, (24, 16))
 
-            # Pulsing gold outer border
-            _pb_a = int(_fade * (150 + 60 * math.sin(_st * 0.004)))
-            _bord = pygame.Surface((_pw, _ph), pygame.SRCALPHA)
-            pygame.draw.rect(_bord, (*_accent, _pb_a), _bord.get_rect(), 1, border_radius=10)
-            screen.blit(_bord, (_px, _py))
+            # Gate VFX (embers, mist, glow — always rendered when in town)
+            if current_level == "town":
+                _draw_gate_vfx(screen, int(town_gate_pos.x), int(town_gate_pos.y),
+                               camera.x, camera.y, pygame.time.get_ticks())
 
-            # Inner accent glow line (top edge)
-            _gl = pygame.Surface((_pw - 16, 1), pygame.SRCALPHA)
-            _gl.fill((*_accent, int(60 * _fade)))
-            screen.blit(_gl, (_px + 8, _py + 2))
+            # Gate tooltip
+            if gate_hovered:
+                gx = int(town_gate_pos.x - camera.x)
+                gy = int(town_gate_pos.y - camera.y)
+                _gl1 = ui_font.render("Town Gate", True, (226, 224, 245))
+                _gl2 = tiny_font.render("[Click] Enter The Wilderness", True, (196, 194, 218))
+                _gtw = max(_gl1.get_width(), _gl2.get_width()) + 18
+                _gth = _gl1.get_height() + _gl2.get_height() + 14
+                _gtr = pygame.Rect(0, 0, _gtw, _gth)
+                _gtr.midbottom = (gx, gy - 100)
+                _gtr.clamp_ip(pygame.Rect(10, 10, SCREEN_WIDTH - 20, SCREEN_HEIGHT - 20))
+                pygame.draw.rect(screen, (14, 14, 22), _gtr, border_radius=8)
+                pygame.draw.rect(screen, (118, 112, 176), _gtr, 1, border_radius=8)
+                screen.blit(_gl1, (_gtr.left + 9, _gtr.top + 5))
+                screen.blit(_gl2, (_gtr.left + 9, _gtr.top + 8 + _gl1.get_height()))
 
-            # Left and right diamond end-caps
-            for _ex, _sign in ((_px + 6, -1), (_px + _pw - 6, 1)):
-                _ey = _py + _ph // 2
-                _dpts = [(_ex, _ey - 4), (_ex + _sign * 4, _ey), (_ex, _ey + 4), (_ex - _sign * 4, _ey)]
-                _ds = pygame.Surface((12, 10), pygame.SRCALPHA)
-                _doff = (min(_ex, _ex + _sign * 4) - 2, _ey - 5)
-                pygame.draw.polygon(screen, (*_accent, _alpha), _dpts)
+            draw_player_resource_bars(
+                screen,
+                player_hp,
+                player_max_hp,
+                player_mana,
+                player_max_mana,
+                ui_font,
+                tiny_font,
+                gold=player_gold,
+                player_level=player_level,
+                xp=player_xp,
+                xp_to_next=player_xp_next,
+            )
+            # Backpack button (bottom-right, above action belt level)
+            _bp_size = 44
+            _bp_x = SCREEN_WIDTH - _bp_size - 16
+            _bp_y = SCREEN_HEIGHT - _bp_size - 8
+            _backpack_btn_rect = pygame.Rect(_bp_x, _bp_y, _bp_size, _bp_size)
+            _bp_hov = _backpack_btn_rect.collidepoint(pygame.mouse.get_pos())
+            _bp_pressed = _bp_hov and pygame.mouse.get_pressed(3)[0]
+            draw_backpack_button_realistic(
+                screen, _backpack_btn_rect, tiny_font,
+                backpack_count=len(backpack_inventory), backpack_capacity=BACKPACK_SLOT_COUNT,
+                hovered=_bp_hov, pressed=_bp_pressed, ticks=pygame.time.get_ticks(),
+            )
 
-            # Floating sparkle particles around the bar
-            for _pi in range(6):
-                _pseed  = _pi * 491 + hash(status_line[:8]) % 997
-                _cycle  = ((_st * 0.0004 + _pi * 0.18) % 1.0)
-                _pfx    = _px + 10 + (_pseed % (_pw - 20))
-                _pfy    = _py + _ph // 2 + math.sin(_st * 0.003 + _pi * 1.1) * 10 - _cycle * 18
-                _pa     = int(clamp(math.sin(_cycle * math.pi) * 160 * _fade, 0, 200))
-                _psize  = 1 if _pseed % 2 == 0 else 2
-                _ps     = pygame.Surface((_psize * 2 + 2, _psize * 2 + 2), pygame.SRCALPHA)
-                pygame.draw.circle(_ps, (*_accent, _pa), (_psize + 1, _psize + 1), _psize)
-                screen.blit(_ps, (int(_pfx), int(_pfy)))
+            # ── WoW Target Frame ─────────────────────────────────────────────────
+            if (current_level in ("wilderness", "ice_biome") and selected_wolf_id is not None
+                    and not show_world_map and not show_skill_tree and not show_character
+                    and not show_crafting and not show_quest_log):
+                for _twolf in active_enemies():
+                    if id(_twolf) == selected_wolf_id and float(_twolf.get("hp", 0.0)) > 0.0:
+                        draw_target_frame(
+                            screen,
+                            str(_twolf.get("name", "Target")),
+                            float(_twolf.get("hp", 0.0)),
+                            float(_twolf.get("max_hp", 100.0)),
+                            int(_twolf.get("level", 1)),
+                            tiny_font,
+                        )
+                        break
 
-            # Text with alpha
-            _txt_a = pygame.Surface((_txt_surf.get_width(), _txt_surf.get_height()), pygame.SRCALPHA)
-            _txt_a.blit(_txt_surf, (0, 0))
-            _txt_a.set_alpha(_alpha)
-            screen.blit(_txt_a, (SCREEN_WIDTH // 2 - _txt_surf.get_width() // 2,
-                                 _py + _ph // 2 - _txt_surf.get_height() // 2))
+            # ── WoW Buff Tracker (below player panel) ─────────────────────────────
+            if not show_world_map and not show_skill_tree and not show_character and not show_crafting:
+                draw_buff_tracker(screen, damage_boost_timer, speed_boost_timer, tiny_font)
 
-        if level_banner_timer > 0.0:
-            alpha = int(255 * clamp(level_banner_timer / 2.8, 0.0, 1.0))
-            banner = font.render(level_banner, True, (236, 236, 236))
-            banner.set_alpha(alpha)
-            screen.blit(banner, (SCREEN_WIDTH // 2 - banner.get_width() // 2, 16))
+            selected_target_pos: Optional[Vector2] = None
+            if current_level in ("wilderness", "ice_biome") and selected_wolf_id is not None:
+                for wolf in active_enemies():
+                    if id(wolf) == selected_wolf_id and isinstance(wolf.get("pos"), Vector2):
+                        selected_target_pos = Vector2(wolf["pos"])
+                        break
+            map_vendor_positions: List[Vector2] = []
+            if current_level == "town":
+                map_vendor_positions = [Vector2(v["pos"]) for v in vendors if isinstance(v.get("pos"), Vector2)]
+            active_map_cache = world_map_cache_by_level.get(current_level, {})
+            minimap_rect = pygame.Rect(0, 0, 0, 0)
+            tracker_anchor_y = 16
+            if not show_world_map and not show_skill_tree and not show_character and not show_crafting and not show_quest_log and not show_professions and not show_level_decor_editor:
+                minimap_rect = draw_wow_minimap(
+                    screen,
+                    active_map_cache,
+                    current_level,
+                    player_pos,
+                    facing,
+                    None,
+                    map_vendor_positions,
+                    selected_target_pos,
+                    tiny_font,
+                    tiny_font,
+                    day_night.time,
+                )
+                tracker_anchor_y = minimap_rect.bottom + 10
+                weather_title = tiny_font.render(f"Weather: {weather_system.get_display_name()}", True, weather_system.get_ui_color())
+                weather_detail = tiny_font.render(weather_system.get_hud_detail(current_level), True, (168, 176, 190))
+                weather_rect = pygame.Rect(
+                    minimap_rect.left,
+                    minimap_rect.bottom + 8,
+                    max(weather_title.get_width(), weather_detail.get_width()) + 18,
+                    weather_title.get_height() + weather_detail.get_height() + 14,
+                )
+                weather_rect.clamp_ip(pygame.Rect(8, 8, SCREEN_WIDTH - 16, SCREEN_HEIGHT - 16))
+                draw_ornate_panel(screen, weather_rect)
+                screen.blit(weather_title, (weather_rect.left + 9, weather_rect.top + 5))
+                screen.blit(weather_detail, (weather_rect.left + 9, weather_rect.top + 7 + weather_title.get_height()))
+                tracker_anchor_y = max(tracker_anchor_y, weather_rect.bottom + 10)
 
-        # Teleport book menu
-        if teleport_menu_open:
-            teleport_menu_rects = draw_teleport_menu(screen)
+            # Active quest tracker (top-right) — compact parchment
+            active_quest_def = next(
+                (q for q in QUEST_DEFINITIONS if quest_states.get(q["id"]) in ("active", "complete")),
+                None,
+            )
+            qt_x = SCREEN_WIDTH - 260
+            qt_y = tracker_anchor_y
+            if active_quest_def:
+                qid = active_quest_def["id"]
+                prog = quest_progress.get(qid, [0] * len(active_quest_def["objectives"]))
+                is_complete = quest_states.get(qid) == "complete"
+                num_obj = len(active_quest_def["objectives"])
+                qt_h = 28 + num_obj * 18 + (16 if is_complete else 0)
+                qt_w = 248
+                qt_panel = pygame.Rect(qt_x - 6, qt_y - 3, qt_w, qt_h)
+                # Bright parchment bg
+                _parch = _make_parchment(qt_w, qt_h)
+                screen.blit(_parch, qt_panel.topleft)
+                pygame.draw.rect(screen, (120, 90, 40), qt_panel, 1, border_radius=2)
+                # Title in dark ink
+                _qt_title = tiny_font.render(active_quest_def["title"], True, (35, 20, 5))
+                screen.blit(_qt_title, (qt_x, qt_y))
+                _div_y = qt_y + _qt_title.get_height() + 1
+                pygame.draw.line(screen, (150, 120, 60), (qt_x, _div_y), (qt_x + qt_w - 16, _div_y), 1)
+                _oy = _div_y + 3
+                for i, obj in enumerate(active_quest_def["objectives"]):
+                    cur = min(prog[i] if i < len(prog) else 0, obj["count"])
+                    tgt = obj["count"]
+                    done = cur >= tgt
+                    lbl = obj["label"].split("(")[0].strip()
+                    _lbl_col = (30, 120, 30) if done else (55, 35, 10)
+                    _obj_s = tiny_font.render(f"- {lbl}  ({cur}/{tgt})", True, _lbl_col)
+                    screen.blit(_obj_s, (qt_x + 2, _oy))
+                    _oy += 18
+                if is_complete:
+                    _ready_s = tiny_font.render("READY -- [J] Turn In", True, (160, 45, 30))
+                    screen.blit(_ready_s, (qt_x + (qt_w - 16 - _ready_s.get_width()) // 2, _oy))
+                qt_y += qt_panel.height + 4
 
-        # Level-up perk selection screen
-        if perk_choice_pending and perk_choices:
-            # Dim overlay
-            _pov = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-            _pov.fill((0, 0, 0, 170))
-            screen.blit(_pov, (0, 0))
-            # Title
-            _pt = font.render(f"LEVEL UP!  Choose a Perk", True, (220, 200, 100))
-            screen.blit(_pt, (SCREEN_WIDTH // 2 - _pt.get_width() // 2, 140))
-            _psub = ui_font.render(f"You are now Level {player_level}  —  Pick one bonus:", True, (180, 175, 155))
-            screen.blit(_psub, (SCREEN_WIDTH // 2 - _psub.get_width() // 2, 180))
-            _perk_card_w = 270
-            _perk_card_h = 130
-            _perk_total_w = len(perk_choices) * (_perk_card_w + 24) - 24
-            _perk_start_x = SCREEN_WIDTH // 2 - _perk_total_w // 2
-            _perk_rects: List[pygame.Rect] = []
-            _mx, _my = pygame.mouse.get_pos()
-            for _pi, _perk in enumerate(perk_choices):
-                _pr = pygame.Rect(_perk_start_x + _pi * (_perk_card_w + 24), 230, _perk_card_w, _perk_card_h)
-                _perk_rects.append(_pr)
-                _hovered = _pr.collidepoint(_mx, _my)
-                _pcol = tuple(_perk["col"])
-                # Card background
-                _card = pygame.Surface((_perk_card_w, _perk_card_h), pygame.SRCALPHA)
-                pygame.draw.rect(_card, (18, 16, 26, 230), _card.get_rect(), border_radius=12)
-                pygame.draw.rect(_card, (*_pcol, 200 if _hovered else 120), _card.get_rect(), 2, border_radius=12)
-                if _hovered:
-                    _shine = pygame.Surface((_perk_card_w, _perk_card_h), pygame.SRCALPHA)
-                    pygame.draw.rect(_shine, (*_pcol, 28), _shine.get_rect(), border_radius=12)
-                    _card.blit(_shine, (0, 0))
-                screen.blit(_card, _pr.topleft)
-                # Perk name
-                _pn = ui_font.render(str(_perk["name"]), True, _pcol)
-                screen.blit(_pn, (_pr.left + _perk_card_w // 2 - _pn.get_width() // 2, _pr.top + 18))
-                # Divider
-                pygame.draw.line(screen, (*_pcol, 100), (_pr.left + 20, _pr.top + 44), (_pr.right - 20, _pr.top + 44))
-                # Perk desc
-                _pd = tiny_font.render(str(_perk["desc"]), True, (210, 210, 210))
-                screen.blit(_pd, (_pr.left + _perk_card_w // 2 - _pd.get_width() // 2, _pr.top + 56))
-                # Number hint
-                _pk = tiny_font.render(f"[{_pi + 1}]", True, (140, 140, 140))
-                screen.blit(_pk, (_pr.left + _perk_card_w // 2 - _pk.get_width() // 2, _pr.top + 100))
+            # Buff indicators
+            buff_y = qt_y
+            for buff_label, timer, col in [
+                (f"DMG +35%  {int(damage_boost_timer)}s", damage_boost_timer, (255, 200, 80)),
+                (f"SPD +28%  {int(speed_boost_timer)}s",  speed_boost_timer,  (120, 210, 240)),
+            ]:
+                if timer > 0.0:
+                    bs = tiny_font.render(buff_label, True, col)
+                    bx = SCREEN_WIDTH - bs.get_width() - 16
+                    pygame.draw.rect(screen, (22, 20, 14), pygame.Rect(bx - 6, buff_y - 2, bs.get_width() + 12, 22), border_radius=6)
+                    screen.blit(bs, (bx, buff_y))
+                    buff_y += 26
 
+            # ── POI Discovery Banner (top-center) ──
+            if poi_active and poi_fade_alpha > 0.1 and poi_world_pos is not None:
+                _poi_alpha = int(min(255, poi_fade_alpha))
+                _poi_title_s = ui_font.render(poi_name, True, (255, 230, 170))
+                _poi_desc_s = tiny_font.render(poi_desc, True, (200, 190, 160))
+                _poi_bw = max(_poi_title_s.get_width(), _poi_desc_s.get_width()) + 60
+                _poi_bh = _poi_title_s.get_height() + _poi_desc_s.get_height() + 22
+                _poi_bx = (SCREEN_WIDTH - _poi_bw) // 2
+                _poi_by = 18
+                _poi_panel = pygame.Surface((_poi_bw, _poi_bh), pygame.SRCALPHA)
+                # Dark parchment background
+                pygame.draw.rect(_poi_panel, (18, 14, 10, _poi_alpha), (0, 0, _poi_bw, _poi_bh), border_radius=8)
+                pygame.draw.rect(_poi_panel, (160, 120, 50, _poi_alpha), (0, 0, _poi_bw, _poi_bh), 2, border_radius=8)
+                # Gold accent lines
+                pygame.draw.line(_poi_panel, (180, 140, 60, _poi_alpha), (10, _poi_bh - 6), (_poi_bw - 10, _poi_bh - 6), 1)
+                pygame.draw.line(_poi_panel, (180, 140, 60, _poi_alpha), (10, 5), (_poi_bw - 10, 5), 1)
+                # Compass marker icon (small diamond)
+                _dm_cx = 20
+                _dm_cy = _poi_bh // 2
+                pygame.draw.polygon(_poi_panel, (220, 180, 60, _poi_alpha),
+                                    [(_dm_cx, _dm_cy - 8), (_dm_cx + 6, _dm_cy), (_dm_cx, _dm_cy + 8), (_dm_cx - 6, _dm_cy)])
+                # Text
+                _poi_title_s.set_alpha(_poi_alpha)
+                _poi_desc_s.set_alpha(_poi_alpha)
+                _poi_panel.blit(_poi_title_s, (36, 8))
+                _poi_panel.blit(_poi_desc_s, (36, 10 + _poi_title_s.get_height()))
+                screen.blit(_poi_panel, (_poi_bx, _poi_by))
+                # Directional arrow pointing toward POI on screen edge
+                _poi_sx = poi_world_pos.x - camera.x
+                _poi_sy = poi_world_pos.y - camera.y
+                _poi_on_screen = 40 < _poi_sx < SCREEN_WIDTH - 40 and 40 < _poi_sy < SCREEN_HEIGHT - 40
+                if not _poi_on_screen:
+                    # Clamp to screen edge and draw arrow
+                    _arr_x = max(30, min(SCREEN_WIDTH - 30, _poi_sx))
+                    _arr_y = max(_poi_by + _poi_bh + 20, min(SCREEN_HEIGHT - 50, _poi_sy))
+                    _arr_dx = poi_world_pos.x - (player_pos.x)
+                    _arr_dy = poi_world_pos.y - (player_pos.y)
+                    _arr_len = max(1.0, math.sqrt(_arr_dx * _arr_dx + _arr_dy * _arr_dy))
+                    _arr_nx = _arr_dx / _arr_len
+                    _arr_ny = _arr_dy / _arr_len
+                    _arr_sz = 12
+                    _tip_x = int(_arr_x + _arr_nx * _arr_sz)
+                    _tip_y = int(_arr_y + _arr_ny * _arr_sz)
+                    _l_x = int(_arr_x - _arr_ny * _arr_sz * 0.5 - _arr_nx * _arr_sz * 0.3)
+                    _l_y = int(_arr_y + _arr_nx * _arr_sz * 0.5 - _arr_ny * _arr_sz * 0.3)
+                    _r_x = int(_arr_x + _arr_ny * _arr_sz * 0.5 - _arr_nx * _arr_sz * 0.3)
+                    _r_y = int(_arr_y - _arr_nx * _arr_sz * 0.5 - _arr_ny * _arr_sz * 0.3)
+                    _acol = (220, 180, 60, _poi_alpha)
+                    _arr_surf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+                    pygame.draw.polygon(_arr_surf, _acol, [(_tip_x, _tip_y), (_l_x, _l_y), (_r_x, _r_y)])
+                    pygame.draw.circle(_arr_surf, _acol, (int(_arr_x), int(_arr_y)), 4)
+                    screen.blit(_arr_surf, (0, 0))
+
+            # Player status effect icons (debuffs/buffs from combat)
+            _EFFECT_ICONS: Dict[str, Tuple[Tuple[int,int,int], str]] = {
+                "burn":    ((255, 100, 30),  "BURN"),
+                "freeze":  ((80,  200, 255), "FRZE"),
+                "slow":    ((130, 160, 220), "SLOW"),
+                "stun":    ((240, 220, 60),  "STUN"),
+                "shield":  ((220, 195, 80),  "SHLD"),
+                "bleed":   ((210, 60,  80),  "BLEED"),
+                "bite":    ((200, 80,  50),  "BITE"),
+                "fear":    ((160, 60, 200),  "FEAR"),
+            }
+            _player_fx = status_effects.get_effects(StatusEffectSystem.PLAYER_KEY)
+            if _player_fx:
+                _fx_icon_size = 30
+                # Position below minimap (WoW-style)
+                _minimap_right = SCREEN_WIDTH - 18
+                _minimap_bottom = 16 + 216 + 6  # frame_size=216, gap
+                _fx_x = _minimap_right
+                _fx_y = _minimap_bottom
+                for _fx in _player_fx:
+                    _fx_col, _fx_lbl = _EFFECT_ICONS.get(_fx.kind, ((200, 200, 200), _fx.kind[:4].upper()))
+                    _fx_x -= _fx_icon_size + 4  # right-aligned, grow leftward
+                    # Icon background
+                    _fx_surf = pygame.Surface((_fx_icon_size, _fx_icon_size), pygame.SRCALPHA)
+                    pygame.draw.rect(_fx_surf, (12, 10, 16, 210), _fx_surf.get_rect(), border_radius=6)
+                    # Colored border — thicker for hostile debuffs
+                    _border_w = 2 if _fx.kind in ("shield",) else 2
+                    pygame.draw.rect(_fx_surf, (*_fx_col, 200), _fx_surf.get_rect(), _border_w, border_radius=6)
+                    # Fill sweep (clockwise drain visual — approximated as bottom-up fill)
+                    _fx_fill = clamp(_fx.duration / max(0.1, _fx.duration + 0.5), 0.0, 1.0)
+                    _fill_h = int((_fx_icon_size - 4) * _fx_fill)
+                    if _fill_h > 0:
+                        _fill_s = pygame.Surface((_fx_icon_size - 4, _fill_h), pygame.SRCALPHA)
+                        _fill_s.fill((*_fx_col, 50))
+                        _fx_surf.blit(_fill_s, (2, _fx_icon_size - _fill_h - 2))
+                    # Icon symbol
+                    _lbl_s = tiny_font.render(_fx_lbl, True, _fx_col)
+                    _fx_surf.blit(_lbl_s, (_fx_icon_size // 2 - _lbl_s.get_width() // 2,
+                                            _fx_icon_size // 2 - _lbl_s.get_height() // 2 - 1))
+                    screen.blit(_fx_surf, (_fx_x, _fx_y))
+                    # Duration text below
+                    _dur_s = tiny_font.render(f"{_fx.duration:.0f}s", True, (180, 180, 180))
+                    screen.blit(_dur_s, (_fx_x + _fx_icon_size // 2 - _dur_s.get_width() // 2,
+                                          _fx_y + _fx_icon_size + 1))
+
+            if npc_menu_mode != "" and active_vendor_idx is not None and current_level == "town" and 0 <= active_vendor_idx < len(vendors):
+                vendor = vendors[active_vendor_idx]
+                dialog = active_vendor_line if active_vendor_line else str(vendor.get("line", ""))
+                draw_npc_menu(
+                    screen,
+                    vendor,
+                    npc_menu_mode,
+                    active_dialogue,
+                    dialog,
+                    quest_states,
+                    QUEST_DEFINITIONS,
+                    npc_option_rects,
+                    dialog_name_font,
+                    dialog_text_font,
+                    tiny_font,
+                )
+
+            # Shop panel (shown when shop_open is set)
+            if shop_open and shop_open in VENDOR_SHOPS:
+                shop_items = VENDOR_SHOPS[shop_open]
+                sp_panel = pygame.Rect(SCREEN_WIDTH - 340, SCREEN_HEIGHT - 280, 316, 44 + len(shop_items) * 46)
+                draw_ornate_panel(screen, sp_panel)
+                title_s = dialog_name_font.render(f"{shop_open} Shop  (Gold: {player_gold}g)", True, (200, 230, 160))
+                screen.blit(title_s, (sp_panel.left + 12, sp_panel.top + 10))
+                for si, sitem in enumerate(shop_items):
+                    row_y = sp_panel.top + 44 + si * 46
+                    key_s = tiny_font.render(f"[{si + 1}]", True, (220, 196, 100))
+                    name_s = dialog_text_font.render(f"{sitem['name']} — {sitem['desc']}", True, (228, 228, 228))
+                    cost_s = tiny_font.render(f"{sitem['cost']}g", True, (220, 196, 100))
+                    screen.blit(key_s, (sp_panel.left + 12, row_y))
+                    screen.blit(name_s, (sp_panel.left + 44, row_y))
+                    screen.blit(cost_s, (sp_panel.right - cost_s.get_width() - 12, row_y))
+                    pygame.draw.line(screen, (60, 60, 70), (sp_panel.left + 10, row_y + 38), (sp_panel.right - 10, row_y + 38))
+
+            # Potion shared-cooldown percentage for radial overlay (used inside unified bar)
+            _potion_cd_elapsed = (pygame.time.get_ticks() - potion_last_used_ms) / 1000.0
+            _potion_cd_pct = max(0.0, 1.0 - _potion_cd_elapsed / 0.35) if potion_last_used_ms > 0 else 0.0
+            _spell_bar_slot_rects, potion_slot_rects = draw_spell_bar(
+                screen, active_spellbook, spell_icons, cooldowns, unlocked_skills,
+                player_mana, selected_spell_idx, tiny_font, ui_font,
+                class_id=selected_class,
+                max_mana=player_max_mana,
+                spell_global_cooldown=spell_global_cooldown,
+                global_cd_max=GLOBAL_SPELL_COOLDOWN,
+                keybinds=spell_slot_keybinds,
+                keybind_editing=keybind_editing_slot,
+                hp=player_hp,
+                max_hp=player_max_hp + bonus_max_hp,
+                gold=player_gold,
+                player_level=player_level,
+                xp=player_xp,
+                xp_to_next=player_xp_next,
+                item_inventory=item_inventory,
+                potion_shared_cd_pct=_potion_cd_pct,
+            )
+            # WoW-style vertical secondary action bar (right side)
+            if not show_spellbook and not show_character and not show_skill_tree:
+                draw_spell_bar_vertical(
+                    screen, full_class_spellbook, active_spellbook,
+                    spell_icons, cooldowns, unlocked_skills,
+                    player_mana, tiny_font, class_id=selected_class,
+                )
+            draw_loot_windows_ui()
+
+            # ── WoW Spellbook Overlay ─────────────────────────────────────────────
+            if show_spellbook and not show_world_map and not perk_choice_pending:
+                _sb_rects = draw_spellbook_overlay(
+                    screen, full_class_spellbook, spell_icons, unlocked_skills,
+                    spellbook_tab, selected_class, tiny_font, ui_font, dialog_name_font,
+                )
+                # Handle tab clicks via mouse (checked each frame while overlay is open)
+                _sb_mouse = pygame.mouse.get_pos()
+                _sb_clicked = pygame.mouse.get_pressed(3)[0]
+                if _sb_clicked:
+                    for _tab_key in ("tab_class", "tab_passive", "tab_general"):
+                        if _tab_key in _sb_rects and _sb_rects[_tab_key].collidepoint(_sb_mouse):
+                            spellbook_tab = _tab_key[4:]   # strip "tab_" prefix
+
+            # Fishing minigame HUD
+            if fishing_active:
+                _fb_w = 340
+                _fb_h = 28
+                _fb_x = SCREEN_WIDTH // 2 - _fb_w // 2
+                _fb_y = SCREEN_HEIGHT - 210
+                # Background bar
+                pygame.draw.rect(screen, (14, 12, 20), pygame.Rect(_fb_x - 2, _fb_y - 2, _fb_w + 4, _fb_h + 4), border_radius=8)
+                pygame.draw.rect(screen, (30, 28, 40), pygame.Rect(_fb_x, _fb_y, _fb_w, _fb_h), border_radius=6)
+                # Catch zone (green)
+                _cz_x = _fb_x + int(fishing_catch_zone * _fb_w)
+                _cz_w = int(0.22 * _fb_w)
+                pygame.draw.rect(screen, (60, 200, 100), pygame.Rect(_cz_x, _fb_y, _cz_w, _fb_h), border_radius=4)
+                # Moving bar (white indicator)
+                _bar_ix = _fb_x + int(fishing_bar_pos * _fb_w) - 4
+                pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(_bar_ix, _fb_y - 2, 8, _fb_h + 4), border_radius=3)
+                # Border
+                pygame.draw.rect(screen, (140, 200, 240), pygame.Rect(_fb_x - 2, _fb_y - 2, _fb_w + 4, _fb_h + 4), 2, border_radius=8)
+                # Timer label
+                _ft_s = tiny_font.render(f"FISHING  [{fishing_timer:.1f}s]  SPACE to catch!", True, (200, 240, 255))
+                screen.blit(_ft_s, (_fb_x + _fb_w // 2 - _ft_s.get_width() // 2, _fb_y - 22))
+            elif fishing_result_timer > 0.0:
+                _fr_col = (80, 220, 120) if fishing_result == "success" else (220, 80, 80)
+                _fr_txt = tiny_font.render("Caught!" if fishing_result == "success" else "Missed!", True, _fr_col)
+                _fr_alpha = int(255 * min(1.0, fishing_result_timer / 0.6))
+                _fr_surf = pygame.Surface((_fr_txt.get_width(), _fr_txt.get_height()), pygame.SRCALPHA)
+                _fr_surf.blit(_fr_txt, (0, 0)); _fr_surf.set_alpha(_fr_alpha)
+                screen.blit(_fr_surf, (SCREEN_WIDTH // 2 - _fr_txt.get_width() // 2, SCREEN_HEIGHT - 220))
+
+            # Near fish rack prompt
+            if current_level == "ice_biome" and not fishing_active and not perk_choice_pending:
+                _fish_rack_pos2 = Vector2(2768, 1478)
+                if player_pos.distance_to(_fish_rack_pos2) <= 180:
+                    _fp_s = tiny_font.render("[F] Fish at the rack", True, (160, 220, 240))
+                    screen.blit(_fp_s, (SCREEN_WIDTH // 2 - _fp_s.get_width() // 2, SCREEN_HEIGHT - 170))
+
+            if status_timer > 0.0 and status_line:
+                _st = pygame.time.get_ticks()
+                _fade = clamp(status_timer / 0.55, 0.0, 1.0)   # fade-out over last 0.55s
+                _alpha = int(_fade * 255)
+
+                # Pick accent colour by message content
+                _sl = status_line.lower()
+                if any(w in _sl for w in ("looted", "gold", "material", "wolf")):
+                    _accent = (210, 175, 72)   # gold
+                elif any(w in _sl for w in ("+hp", "hp.", "health", "restored")):
+                    _accent = (190, 72, 72)    # red
+                elif any(w in _sl for w in ("+mp", "mp.", "mana")):
+                    _accent = (72, 130, 220)   # blue
+                elif any(w in _sl for w in ("damage", "speed", "+20%", "+28%", "+35%")):
+                    _accent = (220, 140, 60)   # orange
+                elif any(w in _sl for w in ("quest", "turned in", "complete")):
+                    _accent = (120, 220, 120)  # green
+                elif any(w in _sl for w in ("skill", "level up", "unlocked")):
+                    _accent = (170, 110, 240)  # purple
+                else:
+                    _accent = (180, 170, 150)  # neutral
+
+                _txt_surf = ui_font.render(status_line, True, (240, 236, 224))
+                _pw = max(280, _txt_surf.get_width() + 60)
+                _ph = 28
+                _px = SCREEN_WIDTH // 2 - _pw // 2
+                _py = 6
+
+                # Background
+                _bg = pygame.Surface((_pw, _ph), pygame.SRCALPHA)
+                pygame.draw.rect(_bg, (8, 7, 12, int(210 * _fade)), _bg.get_rect(), border_radius=10)
+                screen.blit(_bg, (_px, _py))
+
+                # Pulsing gold outer border
+                _pb_a = int(_fade * (150 + 60 * math.sin(_st * 0.004)))
+                _bord = pygame.Surface((_pw, _ph), pygame.SRCALPHA)
+                pygame.draw.rect(_bord, (*_accent, _pb_a), _bord.get_rect(), 1, border_radius=10)
+                screen.blit(_bord, (_px, _py))
+
+                # Inner accent glow line (top edge)
+                _gl = pygame.Surface((_pw - 16, 1), pygame.SRCALPHA)
+                _gl.fill((*_accent, int(60 * _fade)))
+                screen.blit(_gl, (_px + 8, _py + 2))
+
+                # Left and right diamond end-caps
+                for _ex, _sign in ((_px + 6, -1), (_px + _pw - 6, 1)):
+                    _ey = _py + _ph // 2
+                    _dpts = [(_ex, _ey - 4), (_ex + _sign * 4, _ey), (_ex, _ey + 4), (_ex - _sign * 4, _ey)]
+                    _ds = pygame.Surface((12, 10), pygame.SRCALPHA)
+                    _doff = (min(_ex, _ex + _sign * 4) - 2, _ey - 5)
+                    pygame.draw.polygon(screen, (*_accent, _alpha), _dpts)
+
+                # Floating sparkle particles around the bar
+                for _pi in range(6):
+                    _pseed  = _pi * 491 + hash(status_line[:8]) % 997
+                    _cycle  = ((_st * 0.0004 + _pi * 0.18) % 1.0)
+                    _pfx    = _px + 10 + (_pseed % (_pw - 20))
+                    _pfy    = _py + _ph // 2 + math.sin(_st * 0.003 + _pi * 1.1) * 10 - _cycle * 18
+                    _pa     = int(clamp(math.sin(_cycle * math.pi) * 160 * _fade, 0, 200))
+                    _psize  = 1 if _pseed % 2 == 0 else 2
+                    _ps     = pygame.Surface((_psize * 2 + 2, _psize * 2 + 2), pygame.SRCALPHA)
+                    pygame.draw.circle(_ps, (*_accent, _pa), (_psize + 1, _psize + 1), _psize)
+                    screen.blit(_ps, (int(_pfx), int(_pfy)))
+
+                # Text with alpha
+                _txt_a = pygame.Surface((_txt_surf.get_width(), _txt_surf.get_height()), pygame.SRCALPHA)
+                _txt_a.blit(_txt_surf, (0, 0))
+                _txt_a.set_alpha(_alpha)
+                screen.blit(_txt_a, (SCREEN_WIDTH // 2 - _txt_surf.get_width() // 2,
+                                     _py + _ph // 2 - _txt_surf.get_height() // 2))
+
+            if level_banner_timer > 0.0:
+                alpha = int(255 * clamp(level_banner_timer / 2.8, 0.0, 1.0))
+                banner = font.render(level_banner, True, (236, 236, 236))
+                banner.set_alpha(alpha)
+                screen.blit(banner, (SCREEN_WIDTH // 2 - banner.get_width() // 2, 16))
+
+            # Teleport book menu
+            if teleport_menu_open:
+                teleport_menu_rects = draw_teleport_menu(screen)
+
+            # Level-up perk selection screen
+            if perk_choice_pending and perk_choices:
+                # Dim overlay
+                _pov = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+                _pov.fill((0, 0, 0, 170))
+                screen.blit(_pov, (0, 0))
+                # Title
+                _pt = font.render(f"LEVEL UP!  Choose a Perk", True, (220, 200, 100))
+                screen.blit(_pt, (SCREEN_WIDTH // 2 - _pt.get_width() // 2, 140))
+                _psub = ui_font.render(f"You are now Level {player_level}  —  Pick one bonus:", True, (180, 175, 155))
+                screen.blit(_psub, (SCREEN_WIDTH // 2 - _psub.get_width() // 2, 180))
+                _perk_card_w = 270
+                _perk_card_h = 130
+                _perk_total_w = len(perk_choices) * (_perk_card_w + 24) - 24
+                _perk_start_x = SCREEN_WIDTH // 2 - _perk_total_w // 2
+                _perk_rects: List[pygame.Rect] = []
+                _mx, _my = pygame.mouse.get_pos()
+                for _pi, _perk in enumerate(perk_choices):
+                    _pr = pygame.Rect(_perk_start_x + _pi * (_perk_card_w + 24), 230, _perk_card_w, _perk_card_h)
+                    _perk_rects.append(_pr)
+                    _hovered = _pr.collidepoint(_mx, _my)
+                    _pcol = tuple(_perk["col"])
+                    # Card background
+                    _card = pygame.Surface((_perk_card_w, _perk_card_h), pygame.SRCALPHA)
+                    pygame.draw.rect(_card, (18, 16, 26, 230), _card.get_rect(), border_radius=12)
+                    pygame.draw.rect(_card, (*_pcol, 200 if _hovered else 120), _card.get_rect(), 2, border_radius=12)
+                    if _hovered:
+                        _shine = pygame.Surface((_perk_card_w, _perk_card_h), pygame.SRCALPHA)
+                        pygame.draw.rect(_shine, (*_pcol, 28), _shine.get_rect(), border_radius=12)
+                        _card.blit(_shine, (0, 0))
+                    screen.blit(_card, _pr.topleft)
+                    # Perk name
+                    _pn = ui_font.render(str(_perk["name"]), True, _pcol)
+                    screen.blit(_pn, (_pr.left + _perk_card_w // 2 - _pn.get_width() // 2, _pr.top + 18))
+                    # Divider
+                    pygame.draw.line(screen, (*_pcol, 100), (_pr.left + 20, _pr.top + 44), (_pr.right - 20, _pr.top + 44))
+                    # Perk desc
+                    _pd = tiny_font.render(str(_perk["desc"]), True, (210, 210, 210))
+                    screen.blit(_pd, (_pr.left + _perk_card_w // 2 - _pd.get_width() // 2, _pr.top + 56))
+                    # Number hint
+                    _pk = tiny_font.render(f"[{_pi + 1}]", True, (140, 140, 140))
+                    screen.blit(_pk, (_pr.left + _perk_card_w // 2 - _pk.get_width() // 2, _pr.top + 100))
+
+            if _frozen_menu:
+                _frozen_snapshot = screen.copy()
+        if not _frozen_menu:
+            _frozen_snapshot = None
         if show_skill_tree:
             skill_node_rects = draw_skill_tree(
                 screen,
