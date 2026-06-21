@@ -1042,7 +1042,6 @@ def load_rogue_anim_frames(asset_dir: str = "assets/rogue_anim", target_size: in
     except (OSError, ValueError):
         return None
 
-    CELL = 64
     raw: Dict[str, Dict[str, List[pygame.Surface]]] = {}
     fps: Dict[str, float] = {}
     base_dirs = ("down", "up", "right", "down_right", "up_right")
@@ -1058,15 +1057,17 @@ def load_rogue_anim_frames(asset_dir: str = "assets/rogue_anim", target_size: in
                 strip = pygame.image.load(path).convert_alpha()
             except (pygame.error, FileNotFoundError, OSError):
                 continue
-            n = int(info.get("frames", strip.get_width() // CELL))
+            # Cells are square: the cell size IS the strip height (works for 64px or 256px HD).
+            cell = strip.get_height()
+            n = int(info.get("frames", strip.get_width() // cell))
             cells: List[pygame.Surface] = []
             for i in range(n):
-                if (i + 1) * CELL > strip.get_width():
+                if (i + 1) * cell > strip.get_width():
                     break
-                tile = pygame.Surface((CELL, CELL), pygame.SRCALPHA)
-                tile.blit(strip, (0, 0), pygame.Rect(i * CELL, 0, CELL, CELL))
-                if target_size != CELL:
-                    tile = pygame.transform.scale(tile, (target_size, target_size))
+                tile = pygame.Surface((cell, cell), pygame.SRCALPHA)
+                tile.blit(strip, (0, 0), pygame.Rect(i * cell, 0, cell, cell))
+                if target_size != cell:
+                    tile = pygame.transform.smoothscale(tile, (target_size, target_size))
                 cells.append(tile)
             if not cells:
                 continue
