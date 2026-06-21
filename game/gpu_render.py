@@ -142,6 +142,26 @@ class GpuRenderer:
         self.post["scan"].value = float(scan)
         self._post_vao.render(moderngl.TRIANGLES)
 
+    def present_surface(self, surface, vignette=0.28, grade=(1.0, 1.0, 1.0), scan=0.0):
+        """Phase-1 present: upload a full-frame pygame Surface and draw it to the window
+        framebuffer through the post-FX shader. Caller then calls pygame.display.flip().
+        Requires a windowed context (ctx.screen). Non-invasive: the game keeps drawing to
+        `surface` with normal blits."""
+        import pygame
+        if getattr(self, "_ptex", None) is None:
+            self._ptex = self.ctx.texture(self.size, 4)
+            self._ptex.filter = (moderngl.LINEAR, moderngl.LINEAR)
+        # flip vertically (pygame top-left origin -> GL bottom-left)
+        self._ptex.write(pygame.image.tostring(surface, "RGBA", True))
+        self.ctx.screen.use()
+        self.ctx.clear(0.0, 0.0, 0.0, 1.0)
+        self._ptex.use(0)
+        self.post["scene"].value = 0
+        self.post["vignette"].value = float(vignette)
+        self.post["grade"].value = tuple(grade)
+        self.post["scan"].value = float(scan)
+        self._post_vao.render(moderngl.TRIANGLES)
+
     def read_rgba(self) -> bytes:
         """Read back the scene FBO (for headless tests/screenshots)."""
         return self._scene_fbo.read(components=4)

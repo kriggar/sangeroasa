@@ -8440,7 +8440,36 @@ def main() -> None:
     pygame.mixer.pre_init(12000, -16, 2, 512)
     pygame.init()
     pygame.display.set_caption("Sangeroasa")
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.DOUBLEBUF, vsync=1)
+    # GPU rendering path (opt-in via RPG_GPU=1). The game keeps drawing to an offscreen
+    # Surface with normal blits; pygame.display.flip is patched to present it through the
+    # moderngl post-FX shader. Disabled/failed -> identical to the original CPU path.
+    screen = None
+    _gpu = None
+    if os.environ.get("RPG_GPU", "").lower() in ("1", "true", "yes", "on"):
+        try:
+            import moderngl as _mgl
+            from game.gpu_render import GpuRenderer
+            pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.OPENGL | pygame.DOUBLEBUF, vsync=1)
+            _gpu = GpuRenderer((SCREEN_WIDTH, SCREEN_HEIGHT), ctx=_mgl.create_context())
+            screen = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))  # offscreen draw target
+            _gpu_vig = float(os.environ.get("RPG_GPU_VIGNETTE", "0.28"))
+            _gpu_scan = float(os.environ.get("RPG_GPU_SCAN", "0.0"))
+            _real_flip = pygame.display.flip
+
+            def _gpu_flip(*a, **k):
+                try:
+                    _gpu.present_surface(screen, vignette=_gpu_vig, grade=(1.0, 1.0, 1.0), scan=_gpu_scan)
+                except Exception:
+                    pass
+                _real_flip()
+            pygame.display.flip = _gpu_flip
+            print("[GPU] moderngl present enabled:", _gpu.ctx.info.get("GL_RENDERER"), flush=True)
+        except Exception as _gpu_err:
+            print("[GPU] init failed, using CPU renderer:", repr(_gpu_err), flush=True)
+            _gpu = None
+            screen = None
+    if screen is None:
+        screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.DOUBLEBUF, vsync=1)
     pygame.mouse.set_visible(True)
     clock = pygame.time.Clock()
 
