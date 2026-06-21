@@ -662,6 +662,20 @@ def cardinal_anim_direction(delta: Vector2, fallback: str = "down") -> str:
     return "down" if dy >= 0.0 else "up"
 
 
+# 8-way (Diablo-style) direction keys, E going clockwise through S.
+_OCTANT_KEYS = ["right", "down_right", "down", "down_left", "left", "up_left", "up", "up_right"]
+
+
+def octant_anim_direction(delta: Vector2, fallback: str = "down") -> str:
+    """Map a movement/aim vector to one of 8 compass directions (screen y is down)."""
+    dx = float(delta.x)
+    dy = float(delta.y)
+    if abs(dx) <= 0.001 and abs(dy) <= 0.001:
+        return fallback
+    ang = (math.degrees(math.atan2(dy, dx)) + 360.0) % 360.0
+    return _OCTANT_KEYS[int((ang + 22.5) // 45) % 8]
+
+
 def warrior_visual_tier_for_level(player_level: int) -> int:
     level_value = max(1, int(player_level))
     for min_level, tier in WARRIOR_TIER_LEVEL_THRESHOLDS:
@@ -925,12 +939,24 @@ def get_directional_anim_frame(
     if frames is None:
         return None
     anim_data = frames.get(anim) or frames.get("idle") or frames.get("walk") or {}
-    dir_frames = (
-        anim_data.get(direction)
-        or anim_data.get("down")
-        or anim_data.get("right")
-        or next((value for value in anim_data.values() if value), [])
-    )
+    # Diagonal keys (e.g. "down_right") fall back to their component cardinals so
+    # classes that only ship 4 directions still animate when 8-way is requested.
+    _fallback_dirs = {
+        "down_right": ("right", "down"), "down_left": ("left", "down"),
+        "up_right": ("right", "up"), "up_left": ("left", "up"),
+    }
+    dir_frames = anim_data.get(direction)
+    if not dir_frames:
+        for alt in _fallback_dirs.get(direction, ()):
+            dir_frames = anim_data.get(alt)
+            if dir_frames:
+                break
+    if not dir_frames:
+        dir_frames = (
+            anim_data.get("down")
+            or anim_data.get("right")
+            or next((value for value in anim_data.values() if value), [])
+        )
     if not dir_frames:
         return None
     safe_fps = max(0.1, float(fps))
@@ -1019,7 +1045,7 @@ def load_rogue_anim_frames(asset_dir: str = "assets/rogue_anim", target_size: in
     CELL = 64
     raw: Dict[str, Dict[str, List[pygame.Surface]]] = {}
     fps: Dict[str, float] = {}
-    base_dirs = ("down", "up", "right")
+    base_dirs = ("down", "up", "right", "down_right", "up_right")
     base_states = ("idle", "walk", "run", "attack", "hurt", "death")
     for st in base_states:
         for d in base_dirs:
@@ -1050,10 +1076,12 @@ def load_rogue_anim_frames(asset_dir: str = "assets/rogue_anim", target_size: in
     if not raw.get("idle") and not raw.get("walk"):
         return None
 
-    # left = mirror of right
+    # mirror the right-facing directions to get the left-facing ones (free 8-way)
+    _mirror_pairs = (("right", "left"), ("down_right", "down_left"), ("up_right", "up_left"))
     for st, dirs in raw.items():
-        if "right" in dirs and "left" not in dirs:
-            dirs["left"] = [pygame.transform.flip(f, True, False) for f in dirs["right"]]
+        for src, dst in _mirror_pairs:
+            if src in dirs and dst not in dirs:
+                dirs[dst] = [pygame.transform.flip(f, True, False) for f in dirs[src]]
 
     anim_frames: Dict[str, Dict[str, List[pygame.Surface]]] = {st: dict(dirs) for st, dirs in raw.items()}
     # Diablo-2 style: you run by default, so normal movement uses the RUN cycle.

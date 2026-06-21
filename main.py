@@ -77,6 +77,7 @@ from game.entities import *  # enemies/wolves/skeletons/animals/portals
 from game.sprites import *  # sprite/anim/class-visual/recolour/movement helpers
 from game.sprites import build_procedural_anim_frames  # procedural per-state anims (not in __all__)
 from game.sprites import load_rogue_anim_frames  # AI-generated rogue sprite animation set (not in __all__)
+from game.sprites import octant_anim_direction  # 8-way (Diablo-style) facing for sprite anims
 from game.gameplay_math import *  # gameplay math helpers
 from game.render.shops import *  # vendor shop draw functions
 from game.render.glyphs import *  # tool/item glyph icons
@@ -3830,7 +3831,7 @@ def run_session(
                         cooldowns[spell_id] = runtime_result.cooldown_remaining
                         spell_global_cooldown = runtime_result.spell_global_cooldown
                         mana_regen_lock_timer = runtime_result.mana_regen_lock_timer
-                        player_anim_direction = cardinal_anim_direction(runtime_result.aim_direction, player_anim_direction)
+                        player_anim_direction = octant_anim_direction(runtime_result.aim_direction, player_anim_direction)
                     if runtime_result.status_message:
                         set_status(runtime_result.status_message, runtime_result.status_duration)
                     return
@@ -4046,7 +4047,7 @@ def run_session(
                 audio.play_sfx("cast_melee", cooldown_ms=30)
             elif spell_kind == "pillar":
                 audio.play_sfx("cast_ward", cooldown_ms=55)
-        player_anim_direction = cardinal_anim_direction(cast_target - player_pos, player_anim_direction)
+        player_anim_direction = octant_anim_direction(cast_target - player_pos, player_anim_direction)
         player_mana = max(0.0, player_mana - mana_cost)
         spell_cdr = max(0.70, float(spell_mods.get("cooldown_mult", 1.0)))
         slot_key = str(spell.get("slot", "1"))
@@ -4076,7 +4077,7 @@ def run_session(
             homing_target_id = acquired_id
             if isinstance(acquired_pos, Vector2):
                 basic_target = acquired_pos
-        player_anim_direction = cardinal_anim_direction(basic_target - player_pos, player_anim_direction)
+        player_anim_direction = octant_anim_direction(basic_target - player_pos, player_anim_direction)
         cast_basic_attack(
             selected_class,
             player_pos,
@@ -5934,7 +5935,7 @@ def run_session(
                     continue
 
         if moving:
-            player_anim_direction = cardinal_anim_direction(to_target, player_anim_direction)
+            player_anim_direction = octant_anim_direction(to_target, player_anim_direction)
             _fear_speed_mult = 1.4 if _player_feared else 1.0
             effective_speed = speed * passive_move_speed_mult * weather_system.get_speed_multiplier(current_level) * (1.28 if speed_boost_timer > 0.0 else 1.0) * ultimate_move_mult * _fear_speed_mult
             step = min(distance, effective_speed * world_dt)
