@@ -24,3 +24,6 @@ sangeroasa_save.json
 _probe.py
 game/_pb.py
 _extract.py
+
+# Claude Code local settings
+.claude/
