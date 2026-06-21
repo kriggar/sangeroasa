@@ -968,3 +968,63 @@ def move_with_collision(start: Vector2, end: Vector2, step: float, bounds: pygam
 
 def find_path_astar(start: Vector2, end: Vector2, bounds: pygame.Rect, obstacles: List[pygame.Rect], cell_size: int = 32, actor_radius: float = 0.0, max_expansions: int = 1000) -> List[Tuple[float, float]]:
     return [(start.x, start.y), (end.x, end.y)]
+
+
+# (sx, sy, angle[, alpha]) deformation specs per animation state. Travel/lunge offsets
+# are added by draw_player(); these frames carry the POSE deformation only.
+_PROC_ANIM_SPECS = {
+    "idle":   (6.0,  True,  [(1.0, 1.0, 0), (1.0, 1.02, 0), (1.0, 1.0, 0), (1.0, 0.985, 0)]),
+    "walk":   (10.0, True,  [(1.0, 1.0, 3), (1.03, 0.97, 1), (1.0, 1.0, 0), (1.0, 1.0, -3), (1.03, 0.97, -1), (1.0, 1.0, 0)]),
+    "run":    (13.0, True,  [(1.0, 1.05, -5), (1.06, 0.95, -2), (1.0, 1.06, -7), (1.0, 1.05, -5), (1.06, 0.95, -2), (1.0, 1.06, -7)]),
+    "attack": (16.0, False, [(0.96, 1.05, 8), (1.14, 0.9, -12), (1.06, 0.97, -4), (1.0, 1.0, 0)]),
+    "hurt":   (12.0, False, [(1.07, 0.93, 12), (1.03, 0.98, 6), (1.0, 1.0, 0)]),
+    "death":  (9.0,  False, [(1.0, 1.0, -8, 255), (1.0, 0.97, -28, 235), (1.06, 0.9, -52, 205),
+                              (1.12, 0.8, -72, 165), (1.16, 0.7, -84, 115), (1.2, 0.6, -88, 65)]),
+}
+# walk_attack / run_attack reuse the attack pose.
+_PROC_ANIM_SPECS["walk_attack"] = _PROC_ANIM_SPECS["attack"]
+_PROC_ANIM_SPECS["run_attack"] = _PROC_ANIM_SPECS["attack"]
+
+
+def _deform_sprite(base, sx=1.0, sy=1.0, angle=0.0, alpha=255):
+    """Return a transformed copy of base (scale for squash/stretch, rotate for lean)."""
+    w, h = base.get_size()
+    s = base
+    if abs(sx - 1.0) > 0.001 or abs(sy - 1.0) > 0.001:
+        s = pygame.transform.smoothscale(base, (max(2, int(w * sx)), max(2, int(h * sy))))
+    if abs(angle) > 0.1:
+        s = pygame.transform.rotozoom(s, float(angle), 1.0)
+    if alpha < 255:
+        s = s.copy()
+        s.set_alpha(alpha)
+    return s
+
+
+def build_procedural_anim_frames(sprite_right, sprite_left):
+    """Synthesize a full directional animation set from a single character sprite by
+    applying per-state pose deformations (squash/stretch/lean/topple). Returns
+    (frames, fps, durations) in the same format the engine uses for sheet-animated classes.
+    frames: {state: {direction: [Surface, ...]}}; up/down/right share the right sprite,
+    left uses the flipped sprite (with mirrored lean)."""
+    def gen(base, mirror):
+        sign = -1.0 if mirror else 1.0
+        out = {}
+        for state, (_fps, _loop, specs) in _PROC_ANIM_SPECS.items():
+            frames = []
+            for spec in specs:
+                sx, sy, ang = spec[0], spec[1], spec[2] * sign
+                a = spec[3] if len(spec) > 3 else 255
+                frames.append(_deform_sprite(base, sx, sy, ang, a))
+            out[state] = frames
+        return out
+
+    right = gen(sprite_right, False)
+    left = gen(sprite_left, True)
+    frames = {}
+    for state in _PROC_ANIM_SPECS:
+        frames[state] = {"right": right[state], "up": right[state],
+                         "down": right[state], "left": left[state]}
+    fps = {state: spec[0] for state, spec in _PROC_ANIM_SPECS.items()}
+    durations = {state: (len(spec[2]) / max(0.1, spec[0]))
+                 for state, spec in _PROC_ANIM_SPECS.items() if not spec[1]}
+    return frames, fps, durations
