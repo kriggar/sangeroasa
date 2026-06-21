@@ -11,7 +11,10 @@ from pygame import Vector2
 
 from game.utils import clamp, lerp, exp_smooth, rotate_vec, color_lerp, hsv_to_rgb, point_in_rect
 from game.vfx import spawn_particle_burst
+from game.constants import SCREEN_WIDTH, SCREEN_HEIGHT
+from game.data.classes import CLASS_ARCHETYPES
 from game.data.icons import *
+from game.data.items_data import *
 
 __all__ = [
     'profession_xp_to_next',
@@ -52,6 +55,7 @@ __all__ = [
     'resolve_item_icon',
     'normalize_class_id',
     'SPELL_ICON_SOURCES',
+    'extract_sheet_tile',
 ]
 
 
@@ -85,9 +89,6 @@ _ITEMS_ICON_CACHE: Dict[Tuple[int, int, int], Optional[pygame.Surface]] = {}
 _ARBITRARY_SHEET_CACHE: Dict[str, Optional[pygame.Surface]] = {}
 _ARBITRARY_SHEET_ICON_CACHE: Dict[Tuple[str, int, int, int, int], Optional[pygame.Surface]] = {}
 _LOOT_ICON_CACHE: Dict[Tuple[str, str, int], pygame.Surface] = {}
-_PASSIVE_ICON_CACHE: Dict[Tuple[str, int], pygame.Surface] = {}
-_TOOLTIP_SURFACE: Optional[pygame.Surface] = None
-_TOOLTIP_LAST_ITEM: Optional[object] = None
 
 
 def normalize_equipment_stats(stats: Dict[str, object]) -> Dict[str, float]:
@@ -1125,3 +1126,10 @@ def normalize_class_id(raw_class: object, fallback: str = "rogue") -> str:
     if fallback in CLASS_ARCHETYPES:
         return fallback
     return next(iter(CLASS_ARCHETYPES.keys()), "rogue")
+
+
+def extract_sheet_tile(sheet: pygame.Surface, row: int, col: int, size: int) -> pygame.Surface:
+    rect = pygame.Rect(col * size, row * size, size, size)
+    tile = pygame.Surface((size, size), pygame.SRCALPHA)
+    tile.blit(sheet, (0, 0), rect)
+    return tile
