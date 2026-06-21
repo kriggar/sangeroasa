@@ -178,3 +178,44 @@ def draw_damage_numbers(
         label.set_alpha(alpha)
         surface.blit(shadow, (sx - shadow.get_width() // 2 + 1, sy - shadow.get_height() // 2 + 1))
         surface.blit(label, (sx - label.get_width() // 2, sy - label.get_height() // 2))
+
+
+def spell_vfx_palette(spell_id: str, colors: Dict[str, object]) -> Tuple[Tuple[int, int, int], Tuple[int, int, int], Tuple[int, int, int]]:
+    sid = spell_id.lower()
+    if sid == "mage_wind" or sid.startswith("mage_wind_") or "gale" in sid:
+        return (170, 220, 255), (232, 246, 255), (96, 144, 214)
+    if any(k in sid for k in ("frost", "chill", "ice")):
+        return (128, 212, 255), (220, 244, 255), (102, 150, 244)
+    if any(k in sid for k in ("storm", "lightning", "orb")):
+        return (166, 128, 252), (214, 196, 255), (124, 94, 230)
+    if any(k in sid for k in ("venom", "poison", "toxic", "trap")):
+        return (104, 216, 112), (182, 250, 156), (70, 150, 76)
+    if any(k in sid for k in ("holy", "radiant", "aegis", "consecration", "judgment", "paladin")):
+        return (248, 222, 132), (255, 248, 186), (188, 152, 70)
+    if any(k in sid for k in ("shadow", "smoke", "evasion", "rogue")):
+        return (174, 182, 206), (226, 230, 242), (96, 104, 132)
+    if any(k in sid for k in ("ranger", "arrow", "shot", "trap")):
+        return (140, 180, 120), (200, 240, 180), (60, 80, 40)
+    if any(k in sid for k in ("bone", "grave", "soul", "unholy", "necro", "death", "blight")):
+        return (190, 154, 214), (232, 206, 248), (104, 78, 128)
+    if any(k in sid for k in ("war", "iron", "axe", "banner", "stomp", "javelin", "valor")):
+        return (236, 150, 104), (254, 208, 162), (138, 92, 56)
+
+    core = colors.get("core")
+    ring = colors.get("ring")
+    aura = colors.get("aura")
+    trail = colors.get("trail")
+    if isinstance(core, tuple) and len(core) == 3:
+        core_col = core
+    elif isinstance(ring, tuple) and len(ring) == 3:
+        core_col = ring
+    elif isinstance(aura, tuple) and len(aura) == 3:
+        core_col = aura
+    else:
+        core_col = (224, 186, 128)
+    if isinstance(trail, tuple) and len(trail) == 3:
+        accent_col = trail
+    else:
+        accent_col = color_lerp(core_col, (255, 248, 228), 0.48)
+    shadow_col = color_lerp(core_col, (26, 22, 30), 0.42)
+    return core_col, accent_col, shadow_col

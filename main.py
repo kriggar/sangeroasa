@@ -21,7 +21,8 @@ except ImportError:
 from game.constants import *  # noqa: F401,F403
 from game.utils import clamp, exp_smooth, rotate_vec, color_lerp  # pure math/geometry/color helpers
 from game.vfx import (spawn_particle_burst, spawn_blood_splatter, spawn_damage_number,
-                      update_damage_numbers, draw_damage_numbers)
+                      update_damage_numbers, draw_damage_numbers, spell_vfx_palette)
+from game.nav import is_walkable, nearest_walkable
 
 # game/ engine modules — architecture split
 try:
@@ -2879,45 +2880,6 @@ def spell_class_id(spell_id: str) -> str:
     return ""
 
 
-def spell_vfx_palette(spell_id: str, colors: Dict[str, object]) -> Tuple[Tuple[int, int, int], Tuple[int, int, int], Tuple[int, int, int]]:
-    sid = spell_id.lower()
-    if sid == "mage_wind" or sid.startswith("mage_wind_") or "gale" in sid:
-        return (170, 220, 255), (232, 246, 255), (96, 144, 214)
-    if any(k in sid for k in ("frost", "chill", "ice")):
-        return (128, 212, 255), (220, 244, 255), (102, 150, 244)
-    if any(k in sid for k in ("storm", "lightning", "orb")):
-        return (166, 128, 252), (214, 196, 255), (124, 94, 230)
-    if any(k in sid for k in ("venom", "poison", "toxic", "trap")):
-        return (104, 216, 112), (182, 250, 156), (70, 150, 76)
-    if any(k in sid for k in ("holy", "radiant", "aegis", "consecration", "judgment", "paladin")):
-        return (248, 222, 132), (255, 248, 186), (188, 152, 70)
-    if any(k in sid for k in ("shadow", "smoke", "evasion", "rogue")):
-        return (174, 182, 206), (226, 230, 242), (96, 104, 132)
-    if any(k in sid for k in ("ranger", "arrow", "shot", "trap")):
-        return (140, 180, 120), (200, 240, 180), (60, 80, 40)
-    if any(k in sid for k in ("bone", "grave", "soul", "unholy", "necro", "death", "blight")):
-        return (190, 154, 214), (232, 206, 248), (104, 78, 128)
-    if any(k in sid for k in ("war", "iron", "axe", "banner", "stomp", "javelin", "valor")):
-        return (236, 150, 104), (254, 208, 162), (138, 92, 56)
-
-    core = colors.get("core")
-    ring = colors.get("ring")
-    aura = colors.get("aura")
-    trail = colors.get("trail")
-    if isinstance(core, tuple) and len(core) == 3:
-        core_col = core
-    elif isinstance(ring, tuple) and len(ring) == 3:
-        core_col = ring
-    elif isinstance(aura, tuple) and len(aura) == 3:
-        core_col = aura
-    else:
-        core_col = (224, 186, 128)
-    if isinstance(trail, tuple) and len(trail) == 3:
-        accent_col = trail
-    else:
-        accent_col = color_lerp(core_col, (255, 248, 228), 0.48)
-    shadow_col = color_lerp(core_col, (26, 22, 30), 0.42)
-    return core_col, accent_col, shadow_col
 
 
 
@@ -36231,27 +36193,8 @@ def load_resource_bar_assets() -> Dict[str, pygame.Surface]:
     return _RESOURCE_BAR_ASSETS
 
 
-def is_walkable(pos: Vector2, bounds: pygame.Rect, obstacles: List[pygame.Rect], radius: float = 0.0) -> bool:
-    r = int(radius)
-    test_rect = pygame.Rect(int(pos.x) - r, int(pos.y) - r, r * 2, r * 2)
-    if not bounds.contains(test_rect):
-        return False
-    for obs in obstacles:
-        if test_rect.colliderect(obs):
-            return False
-    return True
 
 
-def nearest_walkable(target: Vector2, bounds: pygame.Rect, obstacles: List[pygame.Rect], radius: float = 0.0) -> Vector2:
-    if is_walkable(target, bounds, obstacles, radius):
-        return target
-    for r in range(10, 600, 10):
-        for theta in range(0, 360, 30):
-            rad = math.radians(theta)
-            p = target + Vector2(math.cos(rad), math.sin(rad)) * r
-            if is_walkable(p, bounds, obstacles, radius):
-                return p
-    return target
 
 
 def move_with_collision(start: Vector2, end: Vector2, step: float, bounds: pygame.Rect, obstacles: List[pygame.Rect], radius: float, extra_obstacles: Optional[List[pygame.Rect]] = None) -> Vector2:
