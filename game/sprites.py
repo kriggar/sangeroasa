@@ -1000,6 +1000,80 @@ def _deform_sprite(base, sx=1.0, sy=1.0, angle=0.0, alpha=255):
     return s
 
 
+def load_rogue_anim_frames(asset_dir: str = "assets/rogue_anim", target_size: int = 96):
+    """Load the AI-generated rogue animation set (per-(state,direction) horizontal strips of
+    64px cells, described by manifest.json) into the engine's anim format.
+
+    Returns (anim_frames, anim_fps, anim_durations) or None if assets are missing.
+    Derives left = mirror(right), run = walk, walk_attack/run_attack = attack so every
+    engine state the player state-machine can request is covered.
+    """
+    import json as _json
+    manifest_path = os.path.join(asset_dir, "manifest.json")
+    try:
+        with open(manifest_path, "r", encoding="utf-8") as fh:
+            manifest = _json.load(fh)
+    except (OSError, ValueError):
+        return None
+
+    CELL = 64
+    raw: Dict[str, Dict[str, List[pygame.Surface]]] = {}
+    fps: Dict[str, float] = {}
+    base_dirs = ("down", "up", "right")
+    base_states = ("idle", "walk", "attack", "hurt", "death")
+    for st in base_states:
+        for d in base_dirs:
+            key = f"{st}_{d}"
+            info = manifest.get(key)
+            if not isinstance(info, dict):
+                continue
+            path = os.path.join(asset_dir, f"{key}.png")
+            try:
+                strip = pygame.image.load(path).convert_alpha()
+            except (pygame.error, FileNotFoundError, OSError):
+                continue
+            n = int(info.get("frames", strip.get_width() // CELL))
+            cells: List[pygame.Surface] = []
+            for i in range(n):
+                if (i + 1) * CELL > strip.get_width():
+                    break
+                tile = pygame.Surface((CELL, CELL), pygame.SRCALPHA)
+                tile.blit(strip, (0, 0), pygame.Rect(i * CELL, 0, CELL, CELL))
+                if target_size != CELL:
+                    tile = pygame.transform.scale(tile, (target_size, target_size))
+                cells.append(tile)
+            if not cells:
+                continue
+            raw.setdefault(st, {})[d] = cells
+            fps[st] = float(info.get("fps", 8.0))
+
+    if not raw.get("idle") and not raw.get("walk"):
+        return None
+
+    # left = mirror of right
+    for st, dirs in raw.items():
+        if "right" in dirs and "left" not in dirs:
+            dirs["left"] = [pygame.transform.flip(f, True, False) for f in dirs["right"]]
+
+    anim_frames: Dict[str, Dict[str, List[pygame.Surface]]] = {st: dict(dirs) for st, dirs in raw.items()}
+    # Aliases so the player state-machine always finds a clip.
+    if "walk" in anim_frames:
+        anim_frames.setdefault("run", {k: list(v) for k, v in anim_frames["walk"].items()})
+        fps.setdefault("run", fps.get("walk", 9.0) * 1.35)
+    if "attack" in anim_frames:
+        for alias in ("walk_attack", "run_attack"):
+            anim_frames.setdefault(alias, {k: list(v) for k, v in anim_frames["attack"].items()})
+            fps.setdefault(alias, fps.get("attack", 12.0))
+
+    non_looping = {"attack", "walk_attack", "run_attack", "hurt", "death"}
+    durations: Dict[str, float] = {}
+    for st, dirs in anim_frames.items():
+        if st in non_looping:
+            n = max((len(v) for v in dirs.values()), default=1)
+            durations[st] = max(0.05, float(n) / max(0.1, fps.get(st, 8.0)))
+    return anim_frames, fps, durations
+
+
 def build_procedural_anim_frames(sprite_right, sprite_left):
     """Synthesize a full directional animation set from a single character sprite by
     applying per-state pose deformations (squash/stretch/lean/topple). Returns

@@ -11,6 +11,10 @@ qa_screenshots/
 _debug_*.png
 debug_out.txt
 
+# AI image-gen working dir (concepts, base views, full-res renders, montages).
+# Final game-ready sprites live under assets/ and ARE committed.
+assets_generated/
+
 # OS / editor
 Thumbs.db
 .DS_Store

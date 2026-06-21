@@ -76,6 +76,7 @@ from game.ui.charcreate import *  # character creation screens
 from game.entities import *  # enemies/wolves/skeletons/animals/portals
 from game.sprites import *  # sprite/anim/class-visual/recolour/movement helpers
 from game.sprites import build_procedural_anim_frames  # procedural per-state anims (not in __all__)
+from game.sprites import load_rogue_anim_frames  # AI-generated rogue sprite animation set (not in __all__)
 from game.gameplay_math import *  # gameplay math helpers
 from game.render.shops import *  # vendor shop draw functions
 from game.render.glyphs import *  # tool/item glyph icons
@@ -828,13 +829,24 @@ def run_session(
         durations_candidate = selected_entry.get("anim_durations")
         player_anim_durations = dict(durations_candidate) if isinstance(durations_candidate, dict) else {}
 
-        # Rogue has no hand-drawn sheet — synthesize a full procedural animation set
-        # (idle/walk/run/attack/walk_attack/run_attack/hurt/death) from its single sprite.
+        # Rogue uses an AI-generated hooded-assassin sprite animation set (real frames).
+        # Fall back to procedural deformation only if the assets are missing.
         if selected_class == "rogue":
-            player_anim_frames, player_anim_fps, player_anim_durations = build_procedural_anim_frames(
-                player_sprite, player_sprite_left
-            )
-            base_player_anim_frames = player_anim_frames
+            _rogue_loaded = load_rogue_anim_frames(target_size=96)
+            if _rogue_loaded:
+                player_anim_frames, player_anim_fps, player_anim_durations = _rogue_loaded
+                base_player_anim_frames = player_anim_frames
+                # Use the new character as the static sprite too (shadow sizing / fallback / behind-house contour).
+                try:
+                    player_sprite = player_anim_frames["idle"]["down"][0]
+                    player_sprite_left = player_anim_frames["idle"]["left"][0]
+                except (KeyError, IndexError):
+                    pass
+            else:
+                player_anim_frames, player_anim_fps, player_anim_durations = build_procedural_anim_frames(
+                    player_sprite, player_sprite_left
+                )
+                base_player_anim_frames = player_anim_frames
 
     def refresh_palette_swap() -> None:
         """Re-run only the palette-swap step (fast path: no anim reload)."""
@@ -850,9 +862,18 @@ def run_session(
         # Recolor animation frames from clean base copies
         if isinstance(base_player_anim_frames, dict):
             player_anim_frames = build_equipped_anim_frames(base_player_anim_frames, equipped_items, _cls_color)
-        # Rogue: regenerate procedural animations from the recolored sprite.
+        # Rogue: keep the AI-generated art as-is (no equipment recolor); reload real frames.
         if selected_class == "rogue":
-            player_anim_frames = build_procedural_anim_frames(player_sprite, player_sprite_left)[0]
+            _rogue_loaded = load_rogue_anim_frames(target_size=96)
+            if _rogue_loaded:
+                player_anim_frames = _rogue_loaded[0]
+                try:
+                    player_sprite = player_anim_frames["idle"]["down"][0]
+                    player_sprite_left = player_anim_frames["idle"]["left"][0]
+                except (KeyError, IndexError):
+                    pass
+            else:
+                player_anim_frames = build_procedural_anim_frames(player_sprite, player_sprite_left)[0]
 
     refresh_player_visuals()
 
