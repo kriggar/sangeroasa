@@ -46,6 +46,25 @@ def _patched_flip(*a, **kw):
         for key in (pygame.K_SPACE, pygame.K_RETURN):
             pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key": key, "mod": 0, "unicode": "", "scancode": 0}))
             pygame.event.post(pygame.event.Event(pygame.KEYUP, {"key": key, "mod": 0, "scancode": 0}))
+    # In gameplay, exercise many code paths: movement, spells, ultimate, menus.
+    # This surfaces latent NameErrors in extracted combat/UI modules that the
+    # menu-only path would miss.
+    if n >= 130:
+        cycle = [pygame.K_w, pygame.K_a, pygame.K_s, pygame.K_d,
+                 pygame.K_q, pygame.K_e, pygame.K_r, pygame.K_t,
+                 pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_f,
+                 pygame.K_i, pygame.K_c, pygame.K_k, pygame.K_j,
+                 pygame.K_b, pygame.K_m, pygame.K_p, pygame.K_TAB, pygame.K_ESCAPE]
+        key = cycle[(n // 4) % len(cycle)]
+        if n % 4 == 0:
+            pygame.event.post(pygame.event.Event(pygame.KEYDOWN, {"key": key, "mod": 0, "unicode": "", "scancode": 0}))
+            pygame.event.post(pygame.event.Event(pygame.KEYUP, {"key": key, "mod": 0, "scancode": 0}))
+        # left/right mouse clicks (basic attack / interactions)
+        if n % 11 == 0:
+            for btn in (1, 3):
+                pos = (700 + (n % 200), 400 + (n % 150))
+                pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONDOWN, {"pos": pos, "button": btn}))
+                pygame.event.post(pygame.event.Event(pygame.MOUSEBUTTONUP, {"pos": pos, "button": btn}))
     if n >= MAX_FRAMES:
         pygame.event.post(pygame.event.Event(pygame.QUIT))
 
