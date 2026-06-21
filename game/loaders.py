@@ -10,6 +10,7 @@ from pygame import Vector2
 from game.constants import *
 from game.utils import *
 from game.sprites import *
+from game.data.classes import *
 from game.classes_runtime import *
 from game.render.props import *
 
