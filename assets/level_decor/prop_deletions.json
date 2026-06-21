@@ -1,0 +1,1367 @@
+[
+  {
+    "kind": "anvil",
+    "x": 1460,
+    "y": 1180
+  },
+  {
+    "kind": "banner",
+    "x": 260,
+    "y": 2630
+  },
+  {
+    "kind": "banner",
+    "x": 5840,
+    "y": 4730
+  },
+  {
+    "kind": "bench",
+    "x": 2160,
+    "y": 687
+  },
+  {
+    "kind": "bench",
+    "x": 4940,
+    "y": 2480
+  },
+  {
+    "kind": "bench",
+    "x": 8600,
+    "y": 2870
+  },
+  {
+    "kind": "bench",
+    "x": 9280,
+    "y": 1860
+  },
+  {
+    "kind": "boulevard_bush",
+    "x": 5005,
+    "y": 2360
+  },
+  {
+    "kind": "boulevard_bush",
+    "x": 5009,
+    "y": 1160
+  },
+  {
+    "kind": "brazier",
+    "x": 4680,
+    "y": 3770
+  },
+  {
+    "kind": "brazier",
+    "x": 5320,
+    "y": 3770
+  },
+  {
+    "kind": "cauldron",
+    "x": 1260,
+    "y": 2740
+  },
+  {
+    "kind": "crate",
+    "x": 370,
+    "y": 3730
+  },
+  {
+    "kind": "crate",
+    "x": 734,
+    "y": 1878
+  },
+  {
+    "kind": "crate",
+    "x": 1620,
+    "y": 1280
+  },
+  {
+    "kind": "crate",
+    "x": 2112,
+    "y": 700
+  },
+  {
+    "kind": "crate",
+    "x": 2345,
+    "y": 5427
+  },
+  {
+    "kind": "crate",
+    "x": 3906,
+    "y": 5807
+  },
+  {
+    "kind": "crate",
+    "x": 4705,
+    "y": 3743
+  },
+  {
+    "kind": "crate",
+    "x": 7130,
+    "y": 1150
+  },
+  {
+    "kind": "crate",
+    "x": 7130,
+    "y": 1190
+  },
+  {
+    "kind": "crate",
+    "x": 9119,
+    "y": 1810
+  },
+  {
+    "kind": "crate",
+    "x": 9128,
+    "y": 4031
+  },
+  {
+    "kind": "crate",
+    "x": 9630,
+    "y": 2650
+  },
+  {
+    "kind": "dummy",
+    "x": 160,
+    "y": 690
+  },
+  {
+    "kind": "dummy",
+    "x": 175,
+    "y": 1970
+  },
+  {
+    "kind": "fence",
+    "x": 1200,
+    "y": 3460
+  },
+  {
+    "kind": "fence",
+    "x": 2080,
+    "y": 4880
+  },
+  {
+    "kind": "fence",
+    "x": 7640,
+    "y": 4860
+  },
+  {
+    "kind": "fence",
+    "x": 8580,
+    "y": 4860
+  },
+  {
+    "kind": "flowerbox",
+    "x": 2209,
+    "y": 955
+  },
+  {
+    "kind": "flowerbox",
+    "x": 2810,
+    "y": 1991
+  },
+  {
+    "kind": "flowerbox",
+    "x": 4200,
+    "y": 1619
+  },
+  {
+    "kind": "flowerbox",
+    "x": 4920,
+    "y": 710
+  },
+  {
+    "kind": "flowerbox",
+    "x": 5080,
+    "y": 710
+  },
+  {
+    "kind": "flowerbox",
+    "x": 8660,
+    "y": 4760
+  },
+  {
+    "kind": "flowerbox",
+    "x": 9640,
+    "y": 2270
+  },
+  {
+    "kind": "forge",
+    "x": 1460,
+    "y": 1120
+  },
+  {
+    "kind": "gallows",
+    "x": 3800,
+    "y": 5600
+  },
+  {
+    "kind": "grass_strip",
+    "x": 1100,
+    "y": 1130
+  },
+  {
+    "kind": "grass_strip",
+    "x": 1700,
+    "y": 1130
+  },
+  {
+    "kind": "grass_strip",
+    "x": 3500,
+    "y": 2730
+  },
+  {
+    "kind": "grass_strip",
+    "x": 4100,
+    "y": 2730
+  },
+  {
+    "kind": "grass_strip",
+    "x": 4700,
+    "y": 2730
+  },
+  {
+    "kind": "grass_strip",
+    "x": 6100,
+    "y": 1255
+  },
+  {
+    "kind": "grass_strip",
+    "x": 7100,
+    "y": 1130
+  },
+  {
+    "kind": "grass_strip",
+    "x": 7900,
+    "y": 4330
+  },
+  {
+    "kind": "grass_strip",
+    "x": 8900,
+    "y": 1255
+  },
+  {
+    "kind": "grass_strip",
+    "x": 9100,
+    "y": 1130
+  },
+  {
+    "kind": "grave",
+    "x": 260,
+    "y": 620
+  },
+  {
+    "kind": "grave",
+    "x": 370,
+    "y": 620
+  },
+  {
+    "kind": "grave",
+    "x": 480,
+    "y": 620
+  },
+  {
+    "kind": "grave",
+    "x": 590,
+    "y": 620
+  },
+  {
+    "kind": "grave",
+    "x": 700,
+    "y": 620
+  },
+  {
+    "kind": "grave",
+    "x": 810,
+    "y": 620
+  },
+  {
+    "kind": "grave",
+    "x": 5084,
+    "y": 6100
+  },
+  {
+    "kind": "green_patch",
+    "x": 1100,
+    "y": 1925
+  },
+  {
+    "kind": "green_patch",
+    "x": 2000,
+    "y": 1935
+  },
+  {
+    "kind": "green_patch",
+    "x": 2050,
+    "y": 1325
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 335,
+    "y": 1588
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 460,
+    "y": 700
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 570,
+    "y": 1150
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 950,
+    "y": 1510
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 1010,
+    "y": 1520
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 1150,
+    "y": 940
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 2095,
+    "y": 5356
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 2320,
+    "y": 1010
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 2370,
+    "y": 1020
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 2530,
+    "y": 1030
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 3354,
+    "y": 5788
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 3608,
+    "y": 6470
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 3634,
+    "y": 5740
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 3713,
+    "y": 6127
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 4474,
+    "y": 3796
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 4654,
+    "y": 6124
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 4840,
+    "y": 2430
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 4940,
+    "y": 4140
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 5933,
+    "y": 1975
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 6580,
+    "y": 5550
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 7080,
+    "y": 1240
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 7880,
+    "y": 4340
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 7940,
+    "y": 4410
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 7960,
+    "y": 4340
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 8530,
+    "y": 4862
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 8646,
+    "y": 1754
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 9165,
+    "y": 5711
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 9280,
+    "y": 1740
+  },
+  {
+    "kind": "hd_barrel",
+    "x": 9320,
+    "y": 1760
+  },
+  {
+    "kind": "hd_cart",
+    "x": 650,
+    "y": 1160
+  },
+  {
+    "kind": "hd_cart",
+    "x": 1780,
+    "y": 1780
+  },
+  {
+    "kind": "hd_cart",
+    "x": 2450,
+    "y": 1010
+  },
+  {
+    "kind": "hd_hay",
+    "x": 730,
+    "y": 1170
+  },
+  {
+    "kind": "hd_hay",
+    "x": 790,
+    "y": 1165
+  },
+  {
+    "kind": "hd_hay",
+    "x": 929,
+    "y": 5812
+  },
+  {
+    "kind": "hd_hay",
+    "x": 1610,
+    "y": 6455
+  },
+  {
+    "kind": "hd_hay",
+    "x": 1870,
+    "y": 1790
+  },
+  {
+    "kind": "hd_hay",
+    "x": 1930,
+    "y": 1785
+  },
+  {
+    "kind": "hd_hay",
+    "x": 2080,
+    "y": 920
+  },
+  {
+    "kind": "hd_hay",
+    "x": 2250,
+    "y": 1510
+  },
+  {
+    "kind": "hd_hay",
+    "x": 4272,
+    "y": 5398
+  },
+  {
+    "kind": "hd_hay",
+    "x": 4728,
+    "y": 3865
+  },
+  {
+    "kind": "hd_hay",
+    "x": 5080,
+    "y": 4220
+  },
+  {
+    "kind": "hd_hay",
+    "x": 6164,
+    "y": 5459
+  },
+  {
+    "kind": "hd_hay",
+    "x": 6176,
+    "y": 4610
+  },
+  {
+    "kind": "hd_hay",
+    "x": 7740,
+    "y": 5160
+  },
+  {
+    "kind": "hd_hay",
+    "x": 8500,
+    "y": 4900
+  },
+  {
+    "kind": "hd_hay",
+    "x": 8520,
+    "y": 4920
+  },
+  {
+    "kind": "hd_hay",
+    "x": 9103,
+    "y": 4060
+  },
+  {
+    "kind": "horse_hitch",
+    "x": 584,
+    "y": 5419
+  },
+  {
+    "kind": "horse_hitch",
+    "x": 1019,
+    "y": 1502
+  },
+  {
+    "kind": "horse_hitch",
+    "x": 2411,
+    "y": 1376
+  },
+  {
+    "kind": "horse_hitch",
+    "x": 3455,
+    "y": 2705
+  },
+  {
+    "kind": "house",
+    "x": 140,
+    "y": 680
+  },
+  {
+    "kind": "house",
+    "x": 180,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 180,
+    "y": 2056
+  },
+  {
+    "kind": "house",
+    "x": 200,
+    "y": 1250
+  },
+  {
+    "kind": "house",
+    "x": 263,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 410,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 640,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 870,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 1091,
+    "y": 994
+  },
+  {
+    "kind": "house",
+    "x": 1100,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 1100,
+    "y": 1010
+  },
+  {
+    "kind": "house",
+    "x": 1319,
+    "y": 3628
+  },
+  {
+    "kind": "house",
+    "x": 1330,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 1340,
+    "y": 3780
+  },
+  {
+    "kind": "house",
+    "x": 1560,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 1616,
+    "y": 5661
+  },
+  {
+    "kind": "house",
+    "x": 1625,
+    "y": 5389
+  },
+  {
+    "kind": "house",
+    "x": 1790,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 1820,
+    "y": 3780
+  },
+  {
+    "kind": "house",
+    "x": 1860,
+    "y": 5740
+  },
+  {
+    "kind": "house",
+    "x": 2020,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 2064,
+    "y": 5373
+  },
+  {
+    "kind": "house",
+    "x": 2082,
+    "y": 5043
+  },
+  {
+    "kind": "house",
+    "x": 2096,
+    "y": 1018
+  },
+  {
+    "kind": "house",
+    "x": 2125,
+    "y": 3640
+  },
+  {
+    "kind": "house",
+    "x": 2133,
+    "y": 5936
+  },
+  {
+    "kind": "house",
+    "x": 2180,
+    "y": 5140
+  },
+  {
+    "kind": "house",
+    "x": 2250,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 2325,
+    "y": 5104
+  },
+  {
+    "kind": "house",
+    "x": 2480,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 2710,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 2940,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 3027,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 3040,
+    "y": 612
+  },
+  {
+    "kind": "house",
+    "x": 5170,
+    "y": 3510
+  },
+  {
+    "kind": "house",
+    "x": 7700,
+    "y": 5140
+  },
+  {
+    "kind": "house",
+    "x": 7762,
+    "y": 5146
+  },
+  {
+    "kind": "house",
+    "x": 8620,
+    "y": 5740
+  },
+  {
+    "kind": "house",
+    "x": 8620,
+    "y": 6080
+  },
+  {
+    "kind": "house",
+    "x": 8940,
+    "y": 1480
+  },
+  {
+    "kind": "house",
+    "x": 8940,
+    "y": 5740
+  },
+  {
+    "kind": "house",
+    "x": 9054,
+    "y": 1480
+  },
+  {
+    "kind": "house",
+    "x": 9260,
+    "y": 5740
+  },
+  {
+    "kind": "lamp",
+    "x": 220,
+    "y": 1360
+  },
+  {
+    "kind": "lamp",
+    "x": 800,
+    "y": 2740
+  },
+  {
+    "kind": "lamp",
+    "x": 1000,
+    "y": 990
+  },
+  {
+    "kind": "lamp",
+    "x": 1100,
+    "y": 1140
+  },
+  {
+    "kind": "lamp",
+    "x": 1200,
+    "y": 1510
+  },
+  {
+    "kind": "lamp",
+    "x": 1200,
+    "y": 2110
+  },
+  {
+    "kind": "lamp",
+    "x": 1400,
+    "y": 990
+  },
+  {
+    "kind": "lamp",
+    "x": 1400,
+    "y": 1510
+  },
+  {
+    "kind": "lamp",
+    "x": 1400,
+    "y": 2740
+  },
+  {
+    "kind": "lamp",
+    "x": 1600,
+    "y": 700
+  },
+  {
+    "kind": "lamp",
+    "x": 1600,
+    "y": 990
+  },
+  {
+    "kind": "lamp",
+    "x": 1600,
+    "y": 1510
+  },
+  {
+    "kind": "lamp",
+    "x": 1600,
+    "y": 1995
+  },
+  {
+    "kind": "lamp",
+    "x": 1600,
+    "y": 2110
+  },
+  {
+    "kind": "lamp",
+    "x": 1700,
+    "y": 2740
+  },
+  {
+    "kind": "lamp",
+    "x": 1800,
+    "y": 990
+  },
+  {
+    "kind": "lamp",
+    "x": 1800,
+    "y": 1510
+  },
+  {
+    "kind": "lamp",
+    "x": 1800,
+    "y": 2110
+  },
+  {
+    "kind": "lamp",
+    "x": 2000,
+    "y": 990
+  },
+  {
+    "kind": "lamp",
+    "x": 2000,
+    "y": 1140
+  },
+  {
+    "kind": "lamp",
+    "x": 2000,
+    "y": 1510
+  },
+  {
+    "kind": "lamp",
+    "x": 2000,
+    "y": 2740
+  },
+  {
+    "kind": "lamp",
+    "x": 2200,
+    "y": 990
+  },
+  {
+    "kind": "lamp",
+    "x": 2200,
+    "y": 1510
+  },
+  {
+    "kind": "lamp",
+    "x": 2200,
+    "y": 2110
+  },
+  {
+    "kind": "lamp",
+    "x": 2400,
+    "y": 990
+  },
+  {
+    "kind": "lamp",
+    "x": 2400,
+    "y": 2110
+  },
+  {
+    "kind": "lamp",
+    "x": 2600,
+    "y": 1510
+  },
+  {
+    "kind": "lamp",
+    "x": 2600,
+    "y": 2110
+  },
+  {
+    "kind": "lamp",
+    "x": 2600,
+    "y": 2740
+  },
+  {
+    "kind": "lamp",
+    "x": 2800,
+    "y": 1510
+  },
+  {
+    "kind": "lamp",
+    "x": 2940,
+    "y": 1960
+  },
+  {
+    "kind": "lamp",
+    "x": 2980,
+    "y": 1360
+  },
+  {
+    "kind": "lamp",
+    "x": 3000,
+    "y": 1510
+  },
+  {
+    "kind": "lamp",
+    "x": 3000,
+    "y": 2110
+  },
+  {
+    "kind": "lamp",
+    "x": 3800,
+    "y": 2740
+  },
+  {
+    "kind": "lamp",
+    "x": 4270,
+    "y": 2460
+  },
+  {
+    "kind": "lamp",
+    "x": 4270,
+    "y": 2660
+  },
+  {
+    "kind": "lamp",
+    "x": 4400,
+    "y": 2740
+  },
+  {
+    "kind": "lamp",
+    "x": 4580,
+    "y": 2890
+  },
+  {
+    "kind": "lamp",
+    "x": 4700,
+    "y": 2740
+  },
+  {
+    "kind": "lamp",
+    "x": 4750,
+    "y": 5545
+  },
+  {
+    "kind": "lamp",
+    "x": 4930,
+    "y": 2860
+  },
+  {
+    "kind": "lamp",
+    "x": 4930,
+    "y": 6160
+  },
+  {
+    "kind": "lamp",
+    "x": 5070,
+    "y": 2560
+  },
+  {
+    "kind": "lamp",
+    "x": 5450,
+    "y": 5545
+  },
+  {
+    "kind": "lamp",
+    "x": 5600,
+    "y": 2740
+  },
+  {
+    "kind": "lamp",
+    "x": 5730,
+    "y": 2460
+  },
+  {
+    "kind": "lamp",
+    "x": 5730,
+    "y": 2660
+  },
+  {
+    "kind": "lamp",
+    "x": 6800,
+    "y": 2740
+  },
+  {
+    "kind": "lumber",
+    "x": 380,
+    "y": 870
+  },
+  {
+    "kind": "lumber",
+    "x": 1540,
+    "y": 1240
+  },
+  {
+    "kind": "market_awning",
+    "x": 4620,
+    "y": 3740
+  },
+  {
+    "kind": "market_awning",
+    "x": 4940,
+    "y": 2350
+  },
+  {
+    "kind": "market_awning",
+    "x": 5080,
+    "y": 2350
+  },
+  {
+    "kind": "market_cart",
+    "x": 5500,
+    "y": 2160
+  },
+  {
+    "kind": "meat_rack",
+    "x": 6360,
+    "y": 5610
+  },
+  {
+    "kind": "meat_rack",
+    "x": 7949,
+    "y": 4113
+  },
+  {
+    "kind": "meat_rack",
+    "x": 8460,
+    "y": 2810
+  },
+  {
+    "kind": "milk_churn",
+    "x": 483,
+    "y": 5085
+  },
+  {
+    "kind": "milk_churn",
+    "x": 1975,
+    "y": 1009
+  },
+  {
+    "kind": "milk_churn",
+    "x": 4575,
+    "y": 6101
+  },
+  {
+    "kind": "notice",
+    "x": 4800,
+    "y": 2340
+  },
+  {
+    "kind": "planter",
+    "x": 4200,
+    "y": 4760
+  },
+  {
+    "kind": "potted_tree",
+    "x": 2063,
+    "y": 1037
+  },
+  {
+    "kind": "potted_tree",
+    "x": 2086,
+    "y": 669
+  },
+  {
+    "kind": "potted_tree",
+    "x": 4160,
+    "y": 4740
+  },
+  {
+    "kind": "potted_tree",
+    "x": 6048,
+    "y": 1882
+  },
+  {
+    "kind": "potted_tree",
+    "x": 6292,
+    "y": 1627
+  },
+  {
+    "kind": "rain_barrel",
+    "x": 1692,
+    "y": 5019
+  },
+  {
+    "kind": "rain_barrel",
+    "x": 8895,
+    "y": 2596
+  },
+  {
+    "kind": "rain_barrel",
+    "x": 8978,
+    "y": 5929
+  },
+  {
+    "kind": "rain_barrel",
+    "x": 9610,
+    "y": 2320
+  },
+  {
+    "kind": "scarecrow",
+    "x": 6628,
+    "y": 6254
+  },
+  {
+    "kind": "scarecrow",
+    "x": 8678,
+    "y": 5679
+  },
+  {
+    "kind": "sign",
+    "x": 1640,
+    "y": 1120
+  },
+  {
+    "kind": "signpost",
+    "x": 1192,
+    "y": 1909
+  },
+  {
+    "kind": "signpost",
+    "x": 1485,
+    "y": 1970
+  },
+  {
+    "kind": "signpost",
+    "x": 1725,
+    "y": 5025
+  },
+  {
+    "kind": "signpost",
+    "x": 1738,
+    "y": 1429
+  },
+  {
+    "kind": "signpost",
+    "x": 2912,
+    "y": 983
+  },
+  {
+    "kind": "signpost",
+    "x": 3506,
+    "y": 6190
+  },
+  {
+    "kind": "signpost",
+    "x": 6373,
+    "y": 910
+  },
+  {
+    "kind": "stocks",
+    "x": 1037,
+    "y": 5969
+  },
+  {
+    "kind": "stone_path",
+    "x": 1360,
+    "y": 3640
+  },
+  {
+    "kind": "tasset_coffin",
+    "x": 1180,
+    "y": 650
+  },
+  {
+    "kind": "tasset_coffin",
+    "x": 2080,
+    "y": 650
+  },
+  {
+    "kind": "tasset_coffin",
+    "x": 4560,
+    "y": 700
+  },
+  {
+    "kind": "tasset_execution_block",
+    "x": 1950,
+    "y": 1510
+  },
+  {
+    "kind": "tasset_garlic_stand",
+    "x": 920,
+    "y": 1040
+  },
+  {
+    "kind": "tasset_garlic_stand",
+    "x": 2180,
+    "y": 1040
+  },
+  {
+    "kind": "tasset_garlic_stand",
+    "x": 5160,
+    "y": 2430
+  },
+  {
+    "kind": "tasset_garlic_stand",
+    "x": 9160,
+    "y": 1880
+  },
+  {
+    "kind": "tasset_haystack",
+    "x": 350,
+    "y": 1210
+  },
+  {
+    "kind": "tasset_haystack",
+    "x": 2850,
+    "y": 1210
+  },
+  {
+    "kind": "tasset_impaled_stake",
+    "x": 1440,
+    "y": 1940
+  },
+  {
+    "kind": "tasset_impaled_stake",
+    "x": 1760,
+    "y": 1940
+  },
+  {
+    "kind": "tasset_sweep_well",
+    "x": 5030,
+    "y": 4140
+  },
+  {
+    "kind": "tasset_troita",
+    "x": 1380,
+    "y": 780
+  },
+  {
+    "kind": "tasset_troita",
+    "x": 1820,
+    "y": 780
+  },
+  {
+    "kind": "tasset_wooden_gate",
+    "x": 300,
+    "y": 1110
+  },
+  {
+    "kind": "tasset_wooden_gate",
+    "x": 2900,
+    "y": 1110
+  },
+  {
+    "kind": "tool_rack",
+    "x": 8941,
+    "y": 5937
+  },
+  {
+    "kind": "torch_stand",
+    "x": 1400,
+    "y": 1120
+  },
+  {
+    "kind": "torch_stand",
+    "x": 1800,
+    "y": 1120
+  },
+  {
+    "kind": "torch_stand",
+    "x": 9360,
+    "y": 1800
+  },
+  {
+    "kind": "wall_house",
+    "x": 150,
+    "y": 520
+  },
+  {
+    "kind": "wall_house",
+    "x": 3050,
+    "y": 520
+  },
+  {
+    "kind": "wall_torch",
+    "x": 2250,
+    "y": 630
+  },
+  {
+    "kind": "wall_torch",
+    "x": 3170,
+    "y": 630
+  },
+  {
+    "kind": "weapon_rack",
+    "x": 380,
+    "y": 2670
+  },
+  {
+    "kind": "weapon_rack",
+    "x": 1740,
+    "y": 1140
+  },
+  {
+    "kind": "weapon_rack",
+    "x": 1740,
+    "y": 1210
+  },
+  {
+    "kind": "weapon_rack",
+    "x": 5720,
+    "y": 4770
+  },
+  {
+    "kind": "well",
+    "x": 1220,
+    "y": 840
+  },
+  {
+    "kind": "wheelbarrow",
+    "x": 462,
+    "y": 5082
+  },
+  {
+    "kind": "woodpile",
+    "x": 3863,
+    "y": 4859
+  },
+  {
+    "kind": "woodpile",
+    "x": 5107,
+    "y": 4165
+  }
+]

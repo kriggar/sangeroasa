@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+
+# Regenerable dev output (screenshots, capture frames, debug dumps)
+_visual_review/
+qa_screenshots/
+_debug_*.png
+debug_out.txt
+
+# OS / editor
+Thumbs.db
+.DS_Store
+.vscode/
+*.log
+
+# Local save files
+sangeroasa_save.json

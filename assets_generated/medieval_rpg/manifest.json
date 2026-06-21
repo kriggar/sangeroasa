@@ -1,0 +1,8 @@
+{
+  "seed": 123,
+  "catalog": "catalog.json",
+  "overrides": "catalog_overrides.json",
+  "atlas": "atlas/atlas.png",
+  "atlas_json": "atlas/atlas.json",
+  "asset_count": 64
+}

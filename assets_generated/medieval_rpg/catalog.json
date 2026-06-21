@@ -1,0 +1,1915 @@
+{
+  "seed": 123,
+  "assets": [
+    {
+      "id": "terrain_grass_1",
+      "category": "Terrain",
+      "path": "tiles/terrain/terrain_grass_1.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "terrain",
+        "grass"
+      ],
+      "variants": [
+        "terrain_grass_1",
+        "terrain_grass_2"
+      ],
+      "variant_index": 0,
+      "animation": null
+    },
+    {
+      "id": "terrain_grass_2",
+      "category": "Terrain",
+      "path": "tiles/terrain/terrain_grass_2.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "terrain",
+        "grass"
+      ],
+      "variants": [
+        "terrain_grass_1",
+        "terrain_grass_2"
+      ],
+      "variant_index": 1,
+      "animation": null
+    },
+    {
+      "id": "terrain_dirt_1",
+      "category": "Terrain",
+      "path": "tiles/terrain/terrain_dirt_1.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "terrain",
+        "dirt"
+      ],
+      "variants": [
+        "terrain_dirt_1",
+        "terrain_dirt_2"
+      ],
+      "variant_index": 0,
+      "animation": null
+    },
+    {
+      "id": "terrain_dirt_2",
+      "category": "Terrain",
+      "path": "tiles/terrain/terrain_dirt_2.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "terrain",
+        "dirt"
+      ],
+      "variants": [
+        "terrain_dirt_1",
+        "terrain_dirt_2"
+      ],
+      "variant_index": 1,
+      "animation": null
+    },
+    {
+      "id": "terrain_mud_1",
+      "category": "Terrain",
+      "path": "tiles/terrain/terrain_mud_1.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "terrain",
+        "mud"
+      ],
+      "variants": [
+        "terrain_mud_1",
+        "terrain_mud_2"
+      ],
+      "variant_index": 0,
+      "animation": null
+    },
+    {
+      "id": "terrain_mud_2",
+      "category": "Terrain",
+      "path": "tiles/terrain/terrain_mud_2.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "terrain",
+        "mud"
+      ],
+      "variants": [
+        "terrain_mud_1",
+        "terrain_mud_2"
+      ],
+      "variant_index": 1,
+      "animation": null
+    },
+    {
+      "id": "terrain_cobble_1",
+      "category": "Terrain",
+      "path": "tiles/terrain/terrain_cobble_1.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "terrain",
+        "cobble"
+      ],
+      "variants": [
+        "terrain_cobble_1",
+        "terrain_cobble_2"
+      ],
+      "variant_index": 0,
+      "animation": null
+    },
+    {
+      "id": "terrain_cobble_2",
+      "category": "Terrain",
+      "path": "tiles/terrain/terrain_cobble_2.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "terrain",
+        "cobble"
+      ],
+      "variants": [
+        "terrain_cobble_1",
+        "terrain_cobble_2"
+      ],
+      "variant_index": 1,
+      "animation": null
+    },
+    {
+      "id": "terrain_wood_floor_1",
+      "category": "Terrain",
+      "path": "tiles/terrain/terrain_wood_floor_1.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "terrain",
+        "wood_floor"
+      ],
+      "variants": [
+        "terrain_wood_floor_1",
+        "terrain_wood_floor_2"
+      ],
+      "variant_index": 0,
+      "animation": null
+    },
+    {
+      "id": "terrain_wood_floor_2",
+      "category": "Terrain",
+      "path": "tiles/terrain/terrain_wood_floor_2.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "terrain",
+        "wood_floor"
+      ],
+      "variants": [
+        "terrain_wood_floor_1",
+        "terrain_wood_floor_2"
+      ],
+      "variant_index": 1,
+      "animation": null
+    },
+    {
+      "id": "road_end_n",
+      "category": "Roads",
+      "path": "tiles/roads/road_end_n.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 0,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "n"
+    },
+    {
+      "id": "road_end_s",
+      "category": "Roads",
+      "path": "tiles/roads/road_end_s.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 1,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "s"
+    },
+    {
+      "id": "road_end_w",
+      "category": "Roads",
+      "path": "tiles/roads/road_end_w.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 2,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "w"
+    },
+    {
+      "id": "road_end_e",
+      "category": "Roads",
+      "path": "tiles/roads/road_end_e.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 3,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "e"
+    },
+    {
+      "id": "road_straight_ns",
+      "category": "Roads",
+      "path": "tiles/roads/road_straight_ns.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 4,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "ns"
+    },
+    {
+      "id": "road_straight_we",
+      "category": "Roads",
+      "path": "tiles/roads/road_straight_we.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 5,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "we"
+    },
+    {
+      "id": "road_corner_ne",
+      "category": "Roads",
+      "path": "tiles/roads/road_corner_ne.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 6,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "ne"
+    },
+    {
+      "id": "road_corner_nw",
+      "category": "Roads",
+      "path": "tiles/roads/road_corner_nw.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 7,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "nw"
+    },
+    {
+      "id": "road_corner_se",
+      "category": "Roads",
+      "path": "tiles/roads/road_corner_se.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 8,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "se"
+    },
+    {
+      "id": "road_corner_sw",
+      "category": "Roads",
+      "path": "tiles/roads/road_corner_sw.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 9,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "sw"
+    },
+    {
+      "id": "road_t_nwe",
+      "category": "Roads",
+      "path": "tiles/roads/road_t_nwe.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 10,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "nwe"
+    },
+    {
+      "id": "road_t_nse",
+      "category": "Roads",
+      "path": "tiles/roads/road_t_nse.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 11,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "nse"
+    },
+    {
+      "id": "road_t_nsw",
+      "category": "Roads",
+      "path": "tiles/roads/road_t_nsw.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 12,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "nsw"
+    },
+    {
+      "id": "road_t_swe",
+      "category": "Roads",
+      "path": "tiles/roads/road_t_swe.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 13,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "swe"
+    },
+    {
+      "id": "road_cross",
+      "category": "Roads",
+      "path": "tiles/roads/road_cross.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "road",
+        "autotile"
+      ],
+      "variants": [
+        "road_end_n",
+        "road_end_s",
+        "road_end_w",
+        "road_end_e",
+        "road_straight_ns",
+        "road_straight_we",
+        "road_corner_ne",
+        "road_corner_nw",
+        "road_corner_se",
+        "road_corner_sw",
+        "road_t_nwe",
+        "road_t_nse",
+        "road_t_nsw",
+        "road_t_swe",
+        "road_cross"
+      ],
+      "variant_index": 14,
+      "animation": null,
+      "autotile_group": "dirt_road",
+      "autotile_mask": "nswe"
+    },
+    {
+      "id": "water_deep",
+      "category": "Water",
+      "path": "tiles/water/water_deep_00.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "water",
+        "animated"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": {
+        "frames": [
+          "tiles/water/water_deep_00.png",
+          "tiles/water/water_deep_01.png",
+          "tiles/water/water_deep_02.png",
+          "tiles/water/water_deep_03.png",
+          "tiles/water/water_deep_04.png",
+          "tiles/water/water_deep_05.png"
+        ],
+        "fps": 6
+      }
+    },
+    {
+      "id": "shore_north",
+      "category": "Water",
+      "path": "tiles/water/shore_north.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "water",
+        "shore"
+      ],
+      "variants": [
+        "shore_north",
+        "shore_south",
+        "shore_west",
+        "shore_east",
+        "shore_nw",
+        "shore_ne",
+        "shore_sw",
+        "shore_se"
+      ],
+      "variant_index": 0,
+      "animation": null
+    },
+    {
+      "id": "shore_south",
+      "category": "Water",
+      "path": "tiles/water/shore_south.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "water",
+        "shore"
+      ],
+      "variants": [
+        "shore_north",
+        "shore_south",
+        "shore_west",
+        "shore_east",
+        "shore_nw",
+        "shore_ne",
+        "shore_sw",
+        "shore_se"
+      ],
+      "variant_index": 1,
+      "animation": null
+    },
+    {
+      "id": "shore_west",
+      "category": "Water",
+      "path": "tiles/water/shore_west.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "water",
+        "shore"
+      ],
+      "variants": [
+        "shore_north",
+        "shore_south",
+        "shore_west",
+        "shore_east",
+        "shore_nw",
+        "shore_ne",
+        "shore_sw",
+        "shore_se"
+      ],
+      "variant_index": 2,
+      "animation": null
+    },
+    {
+      "id": "shore_east",
+      "category": "Water",
+      "path": "tiles/water/shore_east.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "water",
+        "shore"
+      ],
+      "variants": [
+        "shore_north",
+        "shore_south",
+        "shore_west",
+        "shore_east",
+        "shore_nw",
+        "shore_ne",
+        "shore_sw",
+        "shore_se"
+      ],
+      "variant_index": 3,
+      "animation": null
+    },
+    {
+      "id": "shore_nw",
+      "category": "Water",
+      "path": "tiles/water/shore_nw.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "water",
+        "shore"
+      ],
+      "variants": [
+        "shore_north",
+        "shore_south",
+        "shore_west",
+        "shore_east",
+        "shore_nw",
+        "shore_ne",
+        "shore_sw",
+        "shore_se"
+      ],
+      "variant_index": 4,
+      "animation": null
+    },
+    {
+      "id": "shore_ne",
+      "category": "Water",
+      "path": "tiles/water/shore_ne.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "water",
+        "shore"
+      ],
+      "variants": [
+        "shore_north",
+        "shore_south",
+        "shore_west",
+        "shore_east",
+        "shore_nw",
+        "shore_ne",
+        "shore_sw",
+        "shore_se"
+      ],
+      "variant_index": 5,
+      "animation": null
+    },
+    {
+      "id": "shore_sw",
+      "category": "Water",
+      "path": "tiles/water/shore_sw.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "water",
+        "shore"
+      ],
+      "variants": [
+        "shore_north",
+        "shore_south",
+        "shore_west",
+        "shore_east",
+        "shore_nw",
+        "shore_ne",
+        "shore_sw",
+        "shore_se"
+      ],
+      "variant_index": 6,
+      "animation": null
+    },
+    {
+      "id": "shore_se",
+      "category": "Water",
+      "path": "tiles/water/shore_se.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "tile",
+        "water",
+        "shore"
+      ],
+      "variants": [
+        "shore_north",
+        "shore_south",
+        "shore_west",
+        "shore_east",
+        "shore_nw",
+        "shore_ne",
+        "shore_sw",
+        "shore_se"
+      ],
+      "variant_index": 7,
+      "animation": null
+    },
+    {
+      "id": "nature_grass_tuft",
+      "category": "Nature",
+      "path": "props/nature/grass_tuft.png",
+      "w": 18,
+      "h": 18,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "DECOR",
+      "collision": null,
+      "tags": [
+        "prop",
+        "nature",
+        "grass"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "nature_flowers",
+      "category": "Nature",
+      "path": "props/nature/flowers.png",
+      "w": 20,
+      "h": 20,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "DECOR",
+      "collision": null,
+      "tags": [
+        "prop",
+        "nature",
+        "flowers"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "nature_rocks",
+      "category": "Nature",
+      "path": "props/nature/rocks.png",
+      "w": 35,
+      "h": 30,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "DECOR",
+      "collision": null,
+      "tags": [
+        "prop",
+        "nature",
+        "rocks"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "nature_bush",
+      "category": "Nature",
+      "path": "props/nature/bush.png",
+      "w": 44,
+      "h": 32,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": null,
+      "tags": [
+        "prop",
+        "nature",
+        "bush"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "nature_tree",
+      "category": "Nature",
+      "path": "props/nature/tree.png",
+      "w": 50,
+      "h": 88,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": {
+        "x": 20,
+        "y": 72,
+        "w": 24,
+        "h": 14
+      },
+      "tags": [
+        "prop",
+        "nature",
+        "tree"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "nature_tree_shadow",
+      "category": "Nature",
+      "path": "props/nature/tree_shadow.png",
+      "w": 58,
+      "h": 20,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "GROUND",
+      "collision": null,
+      "tags": [
+        "shadow",
+        "nature"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "container_barrel",
+      "category": "Containers",
+      "path": "props/containers/barrel.png",
+      "w": 36,
+      "h": 56,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": {
+        "x": 8,
+        "y": 34,
+        "w": 32,
+        "h": 18
+      },
+      "tags": [
+        "prop",
+        "container",
+        "lootable"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "container_crate",
+      "category": "Containers",
+      "path": "props/containers/crate.png",
+      "w": 35,
+      "h": 30,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": {
+        "x": 6,
+        "y": 18,
+        "w": 32,
+        "h": 16
+      },
+      "tags": [
+        "prop",
+        "container",
+        "lootable"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "container_sack",
+      "category": "Containers",
+      "path": "props/containers/sack.png",
+      "w": 28,
+      "h": 30,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": null,
+      "tags": [
+        "prop",
+        "container"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "container_chest_closed",
+      "category": "Containers",
+      "path": "props/containers/chest_closed.png",
+      "w": 40,
+      "h": 32,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": {
+        "x": 8,
+        "y": 18,
+        "w": 36,
+        "h": 16
+      },
+      "tags": [
+        "prop",
+        "container",
+        "lootable"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "container_chest_open",
+      "category": "Containers",
+      "path": "props/containers/chest_open.png",
+      "w": 40,
+      "h": 36,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": null,
+      "tags": [
+        "prop",
+        "container",
+        "lootable"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "furniture_table",
+      "category": "Furniture",
+      "path": "props/furniture/table.png",
+      "w": 58,
+      "h": 34,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": {
+        "x": 8,
+        "y": 16,
+        "w": 58,
+        "h": 24
+      },
+      "tags": [
+        "prop",
+        "furniture"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "furniture_chair",
+      "category": "Furniture",
+      "path": "props/furniture/chair.png",
+      "w": 24,
+      "h": 38,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": {
+        "x": 8,
+        "y": 18,
+        "w": 18,
+        "h": 18
+      },
+      "tags": [
+        "prop",
+        "furniture"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "furniture_bed",
+      "category": "Furniture",
+      "path": "props/furniture/bed.png",
+      "w": 76,
+      "h": 28,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": {
+        "x": 8,
+        "y": 18,
+        "w": 76,
+        "h": 16
+      },
+      "tags": [
+        "prop",
+        "furniture"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "furniture_bookshelf",
+      "category": "Furniture",
+      "path": "props/furniture/bookshelf.png",
+      "w": 40,
+      "h": 72,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": {
+        "x": 12,
+        "y": 20,
+        "w": 36,
+        "h": 54
+      },
+      "tags": [
+        "prop",
+        "furniture"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "furniture_rug",
+      "category": "Furniture",
+      "path": "props/furniture/rug.png",
+      "w": 68,
+      "h": 45,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "DECOR",
+      "collision": null,
+      "tags": [
+        "prop",
+        "furniture",
+        "rug"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "house_prefab_stone",
+      "category": "Houses",
+      "path": "structures/houses/house_prefab_stone.png",
+      "w": 93,
+      "h": 106,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": {
+        "x": 24,
+        "y": 76,
+        "w": 80,
+        "h": 32
+      },
+      "tags": [
+        "structure",
+        "house"
+      ],
+      "variants": [
+        "house_prefab_stone",
+        "house_prefab_timber",
+        "house_prefab_forge"
+      ],
+      "variant_index": 0,
+      "animation": null
+    },
+    {
+      "id": "house_prefab_timber",
+      "category": "Houses",
+      "path": "structures/houses/house_prefab_timber.png",
+      "w": 93,
+      "h": 106,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": {
+        "x": 24,
+        "y": 76,
+        "w": 80,
+        "h": 32
+      },
+      "tags": [
+        "structure",
+        "house"
+      ],
+      "variants": [
+        "house_prefab_stone",
+        "house_prefab_timber",
+        "house_prefab_forge"
+      ],
+      "variant_index": 1,
+      "animation": null
+    },
+    {
+      "id": "house_prefab_forge",
+      "category": "Houses",
+      "path": "structures/houses/house_prefab_forge.png",
+      "w": 93,
+      "h": 106,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "OBJECT",
+      "collision": {
+        "x": 24,
+        "y": 76,
+        "w": 80,
+        "h": 32
+      },
+      "tags": [
+        "structure",
+        "house"
+      ],
+      "variants": [
+        "house_prefab_stone",
+        "house_prefab_timber",
+        "house_prefab_forge"
+      ],
+      "variant_index": 2,
+      "animation": null
+    },
+    {
+      "id": "house_mod_wall",
+      "category": "Houses",
+      "path": "structures/houses/house_mod_wall.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "OBJECT",
+      "collision": null,
+      "tags": [
+        "structure",
+        "house",
+        "modular",
+        "wall"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "house_mod_corner",
+      "category": "Houses",
+      "path": "structures/houses/house_mod_corner.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "OBJECT",
+      "collision": null,
+      "tags": [
+        "structure",
+        "house",
+        "modular",
+        "corner"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "house_mod_door",
+      "category": "Houses",
+      "path": "structures/houses/house_mod_door.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "OBJECT",
+      "collision": null,
+      "tags": [
+        "structure",
+        "house",
+        "modular",
+        "door"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "house_mod_window",
+      "category": "Houses",
+      "path": "structures/houses/house_mod_window.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "OBJECT",
+      "collision": null,
+      "tags": [
+        "structure",
+        "house",
+        "modular",
+        "window"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "house_mod_roof",
+      "category": "Houses",
+      "path": "structures/houses/house_mod_roof.png",
+      "w": 32,
+      "h": 32,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "OVERLAY",
+      "collision": null,
+      "tags": [
+        "structure",
+        "house",
+        "modular",
+        "roof"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": null
+    },
+    {
+      "id": "vfx_bolt_cast_flash",
+      "category": "VFX",
+      "path": "vfx/spells/bolt_cast_flash_00.png",
+      "w": 33,
+      "h": 33,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "VFX",
+      "collision": null,
+      "tags": [
+        "vfx",
+        "spell",
+        "bolt"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": {
+        "frames": [
+          "vfx/spells/bolt_cast_flash_00.png",
+          "vfx/spells/bolt_cast_flash_01.png",
+          "vfx/spells/bolt_cast_flash_02.png"
+        ],
+        "fps": 10
+      }
+    },
+    {
+      "id": "vfx_bolt_projectile",
+      "category": "VFX",
+      "path": "vfx/spells/bolt_projectile_00.png",
+      "w": 33,
+      "h": 17,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "VFX",
+      "collision": null,
+      "tags": [
+        "vfx",
+        "spell",
+        "bolt"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": {
+        "frames": [
+          "vfx/spells/bolt_projectile_00.png",
+          "vfx/spells/bolt_projectile_01.png",
+          "vfx/spells/bolt_projectile_02.png",
+          "vfx/spells/bolt_projectile_03.png"
+        ],
+        "fps": 12
+      }
+    },
+    {
+      "id": "vfx_bolt_impact",
+      "category": "VFX",
+      "path": "vfx/spells/bolt_impact_00.png",
+      "w": 29,
+      "h": 29,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "VFX",
+      "collision": null,
+      "tags": [
+        "vfx",
+        "spell",
+        "bolt"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": {
+        "frames": [
+          "vfx/spells/bolt_impact_00.png",
+          "vfx/spells/bolt_impact_01.png",
+          "vfx/spells/bolt_impact_02.png",
+          "vfx/spells/bolt_impact_03.png",
+          "vfx/spells/bolt_impact_04.png",
+          "vfx/spells/bolt_impact_05.png"
+        ],
+        "fps": 12
+      }
+    },
+    {
+      "id": "vfx_summon_rune",
+      "category": "VFX",
+      "path": "vfx/spells/summon_rune_00.png",
+      "w": 52,
+      "h": 45,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "VFX",
+      "collision": null,
+      "tags": [
+        "vfx",
+        "spell",
+        "summon"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": {
+        "frames": [
+          "vfx/spells/summon_rune_00.png",
+          "vfx/spells/summon_rune_01.png",
+          "vfx/spells/summon_rune_02.png",
+          "vfx/spells/summon_rune_03.png",
+          "vfx/spells/summon_rune_04.png",
+          "vfx/spells/summon_rune_05.png"
+        ],
+        "fps": 8
+      }
+    },
+    {
+      "id": "ambient_fire_small",
+      "category": "VFX",
+      "path": "vfx/ambient/fire_small_00.png",
+      "w": 28,
+      "h": 54,
+      "origin": {
+        "mode": "bottom_center",
+        "x": 0.5,
+        "y": 1.0
+      },
+      "layer": "VFX",
+      "collision": null,
+      "tags": [
+        "vfx",
+        "ambient",
+        "fire"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": {
+        "frames": [
+          "vfx/ambient/fire_small_00.png",
+          "vfx/ambient/fire_small_01.png",
+          "vfx/ambient/fire_small_02.png",
+          "vfx/ambient/fire_small_03.png",
+          "vfx/ambient/fire_small_04.png",
+          "vfx/ambient/fire_small_05.png",
+          "vfx/ambient/fire_small_06.png",
+          "vfx/ambient/fire_small_07.png"
+        ],
+        "fps": 10
+      }
+    },
+    {
+      "id": "ambient_smoke_puff",
+      "category": "VFX",
+      "path": "vfx/ambient/smoke_puff_00.png",
+      "w": 36,
+      "h": 27,
+      "origin": {
+        "mode": "center",
+        "x": 0.5,
+        "y": 0.5
+      },
+      "layer": "VFX",
+      "collision": null,
+      "tags": [
+        "vfx",
+        "ambient",
+        "smoke"
+      ],
+      "variants": [],
+      "variant_index": null,
+      "animation": {
+        "frames": [
+          "vfx/ambient/smoke_puff_00.png",
+          "vfx/ambient/smoke_puff_01.png",
+          "vfx/ambient/smoke_puff_02.png",
+          "vfx/ambient/smoke_puff_03.png",
+          "vfx/ambient/smoke_puff_04.png",
+          "vfx/ambient/smoke_puff_05.png"
+        ],
+        "fps": 9
+      }
+    }
+  ]
+}

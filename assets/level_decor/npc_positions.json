@@ -1,0 +1,81 @@
+{
+  "town": [
+    {
+      "name": "Aldric the Blacksmith",
+      "x": 762.86,
+      "y": 684.48,
+      "shop_x": 756.92,
+      "shop_y": 588.48
+    },
+    {
+      "name": "Marta the Alchemist",
+      "x": 1051.3,
+      "y": 1353.75,
+      "shop_x": 1150.83,
+      "shop_y": 1257.75
+    },
+    {
+      "name": "Bran the Tailor",
+      "x": 2848.39,
+      "y": 684.53,
+      "shop_x": 2733.55,
+      "shop_y": 588.53
+    },
+    {
+      "name": "Iris the Leatherworker",
+      "x": 2984.71,
+      "y": 2023.66,
+      "shop_x": 2878.43,
+      "shop_y": 1887.67
+    },
+    {
+      "name": "Oswin the Merchant",
+      "x": 2323.08,
+      "y": 666.13,
+      "shop_x": 2295.74,
+      "shop_y": 570.13
+    },
+    {
+      "name": "Celia the Baker",
+      "x": 1159.84,
+      "y": 667.48,
+      "shop_x": 1177.92,
+      "shop_y": 571.48
+    },
+    {
+      "name": "Dorin the Guard",
+      "x": 2739.4,
+      "y": 1606.0,
+      "shop_x": 2700.0,
+      "shop_y": 1510.0
+    },
+    {
+      "name": "Vesna the Herbalist",
+      "x": 176.95,
+      "y": 672.78,
+      "shop_x": 286.0,
+      "shop_y": 576.78
+    },
+    {
+      "name": "Halvard the Sailor",
+      "x": 9112.31,
+      "y": 1637.45,
+      "shop_x": 9064.28,
+      "shop_y": 1541.45
+    },
+    {
+      "name": "Lenna the Miller",
+      "x": 1952.55,
+      "y": 1457.51,
+      "shop_x": 2001.96,
+      "shop_y": 1361.51
+    },
+    {
+      "name": "Cormac the Tanner",
+      "x": 885.25,
+      "y": 1876.23,
+      "shop_x": 1000.0,
+      "shop_y": 1780.0
+    }
+  ]
+}

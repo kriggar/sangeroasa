@@ -1,0 +1,10 @@
+{
+  "ambient_fire_small": {
+    "origin": {
+      "mode": "center",
+      "x": 0.5,
+      "y": 0.5
+    },
+    "layer": "OBJECT"
+  }
+}
