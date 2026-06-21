@@ -15,20 +15,41 @@ Saves are written to `~/sangeroasa_save.json`.
 
 ## Project layout
 
+`main.py` is now just the entry point + the `run_session` game loop; all engine code
+lives in focused `game/` modules.
+
 ```
-main.py                  Game entry point and (currently) most of the engine/runtime
-game/                    Extracted, importable engine modules
-  constants.py             Shared constants
-  utils.py                 Small shared helpers
-  combat/                  Combat runtime, spells, kits, talents, vfx, feedback
-  hud/                     HUD widgets (e.g. orb/globe)
-  systems/ ui/ world/      Targets for ongoing extraction from main.py
+main.py                  Entry point: run_session() game loop, main(), choose_launch_mode()
+game/
+  constants.py             Tuning constants & asset paths (single source of truth)
+  state.py                 Shared runtime state (vendor inventories, HUD flash state)
+  utils.py                 Pure math/geometry/colour helpers
+  gameplay_math.py         Gameplay math (facing, bezier, xp/level, spell VFX themes)
+  nav.py                   Walkability / pathing helpers
+  vfx.py                   Particle & damage-number spawn/update/draw
+  audio.py                 Procedural audio engine (GameAudio)
+  sprites.py               Sprite/anim, class visuals, recolour, equipped-sprite, movement
+  items.py                 Item metrics, icon building/resolution, tooltips, caches
+  classes_runtime.py       Spellbook / skill-tree / passive / stat helpers
+  loaders.py               Rogue/class-visual/vendor/NPC loaders
+  entities.py              Enemies, wolves, skeletons, passive animals, portals
+  farm.py                  Farm animal spawn/AI/rendering
+  vendors.py               Vendor placement/update/render, shop positioning
+  assets.py                AssetManager (catalog-driven asset pack loader)
+  dialogue.py              NPC dialogue + quest-giver logic, DialogueSession
+  data/                    Pure data tables (classes, icons, items, quests, world, …)
+  render/                  props.py (props/buildings), shops.py, glyphs.py (icon draws)
+  combat/                  runtime, spells, kits, talents, vfx, spellcast, ultimates
+  systems/core.py          Day/night, weather, particles, status effects, camera, …
+  hud/                     Low-level HUD widgets (orb/globe)
+  ui/                      hud.py (in-game UI screens), screens.py, charcreate.py
+  world/                   scenes.py (town/wilderness/ice), level_decor.py
 tools/
   generate_medieval_assets.py   Procedural asset-pack generator
 assets/                  Game art, audio, level decor, fonts (authored content)
 assets_generated/        Output of local sprite generation (ComfyUI pipeline)
 tests/
-  smoke_test.py          Headless boot test (dummy SDL drivers, bounded frames)
+  smoke_test.py          Headless boot test (dummy SDL, exercises gameplay/menus/spells)
 ```
 
 ## Development
@@ -36,8 +57,9 @@ tests/
 Verify the game still boots and runs headlessly after a change:
 
 ```bash
-python -c "import main"          # fast: executes all module-level definitions
-python tests/smoke_test.py       # runs the real game loop for ~180 frames headless
+python -c "import main"               # fast: executes all module-level definitions
+python tests/smoke_test.py            # runs the real game loop ~180 frames headless
+SMOKE_FRAMES=500 python tests/smoke_test.py   # longer run; exercises spells/menus/combat
 ```
 
 The runtime writes `assets/level_decor/npc_positions.json` during play, so it may
