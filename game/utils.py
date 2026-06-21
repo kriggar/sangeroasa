@@ -1,6 +1,6 @@
 """
 game/utils.py
-Pure math / geometry utility functions for Raven Hollow RPG.
+Pure math / geometry utility functions for Sangeroasa.
 No pygame, no game state — safe to import anywhere.
 """
 from __future__ import annotations
@@ -16,6 +16,14 @@ def clamp(value: float, lo: float, hi: float) -> float:
 def lerp(a: float, b: float, t: float) -> float:
     """Linear interpolation between a and b by t in [0, 1]."""
     return a + (b - a) * clamp(t, 0.0, 1.0)
+
+
+def exp_smooth(current: float, target: float, sharpness: float, dt: float) -> float:
+    """Framerate-independent exponential approach of current toward target."""
+    if dt <= 0.0:
+        return float(current)
+    weight = 1.0 - math.exp(-max(0.0, float(sharpness)) * dt)
+    return float(current) + (float(target) - float(current)) * weight
 
 
 def rotate_vec(v: "pygame.Vector2", angle_rad: float) -> "pygame.Vector2":  # type: ignore[name-defined]

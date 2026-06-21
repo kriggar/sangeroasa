@@ -19,10 +19,10 @@ except ImportError:
 
 # Canonical tuning constants and asset paths — single source of truth.
 from game.constants import *  # noqa: F401,F403
+from game.utils import clamp, exp_smooth, rotate_vec  # pure math/geometry helpers
 
 # game/ engine modules — architecture split
 try:
-    from game import utils as game_utils  # type: ignore[import]
     from game.combat import CombatRuntime, CombatSceneContext, apply_class_overrides  # type: ignore[import]
     from game.hud import (  # type: ignore[import]
         HUD_ORB_R as _HUD_ORB_R,
@@ -34,7 +34,6 @@ try:
         draw_hud_globe as _draw_hud_globe,
     )
 except ImportError:
-    game_utils = None  # type: ignore[assignment]
     CombatRuntime = None  # type: ignore[assignment]
     CombatSceneContext = None  # type: ignore[assignment]
     apply_class_overrides = None  # type: ignore[assignment]
@@ -2892,15 +2891,7 @@ def skill_spell_modifiers(
     return mods_by_spell
 
 
-def clamp(value: float, minimum: float, maximum: float) -> float:
-    return max(minimum, min(value, maximum))
-
-
-def exp_smooth(current: float, target: float, sharpness: float, dt: float) -> float:
-    if dt <= 0.0:
-        return float(current)
-    weight = 1.0 - math.exp(-max(0.0, float(sharpness)) * dt)
-    return float(current) + (float(target) - float(current)) * weight
+# clamp / exp_smooth / rotate_vec are imported from game.utils (see top of file).
 
 
 def facing_to_direction(facing: int, default: str = "right") -> str:
@@ -2929,10 +2920,7 @@ def level_progression_bonus(level: int) -> Tuple[float, float, float]:
     return hp_bonus, mana_bonus, regen_bonus
 
 
-def rotate_vec(v: Vector2, angle: float) -> Vector2:
-    c = math.cos(angle)
-    s = math.sin(angle)
-    return Vector2(v.x * c - v.y * s, v.x * s + v.y * c)
+# rotate_vec is imported from game.utils (see top of file).
 
 
 def color_lerp(a: Tuple[int, int, int], b: Tuple[int, int, int], t: float) -> Tuple[int, int, int]:
