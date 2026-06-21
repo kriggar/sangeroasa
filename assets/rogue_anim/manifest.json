@@ -5,7 +5,7 @@
  },
  "walk_down": {
   "frames": 6,
-  "fps": 9.0
+  "fps": 10.0
  },
  "attack_down": {
   "frames": 4,
@@ -25,7 +25,7 @@
  },
  "walk_up": {
   "frames": 6,
-  "fps": 9.0
+  "fps": 10.0
  },
  "attack_up": {
   "frames": 4,
@@ -45,7 +45,7 @@
  },
  "walk_right": {
   "frames": 6,
-  "fps": 9.0
+  "fps": 10.0
  },
  "attack_right": {
   "frames": 4,
@@ -58,5 +58,17 @@
  "death_right": {
   "frames": 5,
   "fps": 9.0
+ },
+ "run_down": {
+  "frames": 6,
+  "fps": 13.0
+ },
+ "run_up": {
+  "frames": 6,
+  "fps": 13.0
+ },
+ "run_right": {
+  "frames": 6,
+  "fps": 13.0
  }
 }

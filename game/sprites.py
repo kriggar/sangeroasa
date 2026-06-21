@@ -1020,7 +1020,7 @@ def load_rogue_anim_frames(asset_dir: str = "assets/rogue_anim", target_size: in
     raw: Dict[str, Dict[str, List[pygame.Surface]]] = {}
     fps: Dict[str, float] = {}
     base_dirs = ("down", "up", "right")
-    base_states = ("idle", "walk", "attack", "hurt", "death")
+    base_states = ("idle", "walk", "run", "attack", "hurt", "death")
     for st in base_states:
         for d in base_dirs:
             key = f"{st}_{d}"
