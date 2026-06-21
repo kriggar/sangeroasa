@@ -6044,7 +6044,11 @@ def run_session(
                     request_player_path(Vector2(approach_x, vendor_pos.y + 6), ignore_vendor_idx=pending_vendor_idx)
 
             update_vendors(vendors, world_dt, town_walk_bounds, combined_obstacles, active_vendor_idx)
-            update_farm_animals(farm_animals, world_dt)
+            # Skip farm-animal AI (wander + separation solver) when far from every pen —
+            # off-screen animals don't need simulating and aren't visible.
+            if any(isinstance(_a.get("pos"), Vector2) and player_pos.distance_to(_a["pos"]) < 1100.0
+                   for _a in farm_animals):
+                update_farm_animals(farm_animals, world_dt)
         else:
             active_vendor_idx = None
             pending_vendor_idx = None
@@ -6975,6 +6979,12 @@ def run_session(
                 else:
                     _vpos = vendor["pos"]
                     _shop_screen = Vector2(_vpos.x - _cam_ix, _vpos.y - _cam_iy)
+                # Viewport cull: shop stands are large and expensive to draw; skip any
+                # whose footprint is fully off-screen (generous margin for big buildings).
+                if (_shop_screen.x < -480 or _shop_screen.x > SCREEN_WIDTH + 480 or
+                        _shop_screen.y < -640 or _shop_screen.y > SCREEN_HEIGHT + 320):
+                    _vendor_behind_flags.append(False)
+                    continue
                 # Check if player is behind this shop (use both stand and vendor pos)
                 _sw = _shop_world if isinstance(_shop_world, Vector2) else vendor["pos"]
                 _vw = vendor["pos"]
@@ -7194,6 +7204,11 @@ def run_session(
                             screen.blit(drag_label, (anchor[0] - drag_label.get_width() // 2, anchor[1] - 24))
             elif actor_type == "farm_animal":
                 _fa_entry = farm_animals[idx]
+                _fa_pos = _fa_entry.get("pos")
+                if isinstance(_fa_pos, Vector2) and (
+                        _fa_pos.x - camera.x < -120 or _fa_pos.x - camera.x > SCREEN_WIDTH + 120 or
+                        _fa_pos.y - camera.y < -120 or _fa_pos.y - camera.y > SCREEN_HEIGHT + 120):
+                    continue
                 draw_farm_animal(screen, _fa_entry, int(camera.x), int(camera.y), ticks)
             elif actor_type == "wildlife":
                 critter = active_passives()[idx]

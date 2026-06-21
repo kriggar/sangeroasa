@@ -324,7 +324,10 @@ class WeatherSystem:
     def render(self, surface: pygame.Surface) -> None:
         cloud_alpha = int(92 * clamp(self.cloud_cover, 0.0, 1.0))
         if cloud_alpha > 0:
-            cloud_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+            # Reuse one full-screen scratch surface instead of allocating ~4.7MB every frame.
+            cloud_surface = getattr(self, "_fs_buf", None)
+            if cloud_surface is None:
+                cloud_surface = self._fs_buf = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
             if self.state == "storm":
                 cloud_color = (18, 22, 34, cloud_alpha)
             elif self.state == "rain":
