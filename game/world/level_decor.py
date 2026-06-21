@@ -16,6 +16,7 @@ from game.vfx import *
 from game.gameplay_math import *
 from game.sprites import *
 from game.assets import *
+from game.assets import _scale_surface_to_fit, _humanize_catalog_asset_id
 from game.items import *
 from game.render.props import *
 from game.render.glyphs import *
