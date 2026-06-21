@@ -57,6 +57,7 @@ from game.audio import GameAudio  # procedural audio engine
 
 
 from game.data.classes import *  # class & skill data tables
+from game.data.world_data import (_POTIONS, TELEPORT_BOOK_ITEM, CLASS_ARMOR_SET_BONUSES, WOLF_MATERIALS, MATERIAL_ORDER, PROFESSION_DEFINITIONS, PROFESSION_ORDER, PROFESSION_MAX_SKILL)
 from game.data.icons import *  # spell-icon maps & class palettes
 from game.data.items_data import *  # item/equipment data tables
 from game.items import *  # item/sprite/icon/tooltip helpers
@@ -87,31 +88,12 @@ if callable(apply_class_overrides):
 VENDOR_SHOPS: Dict[str, List[Dict[str, object]]] = {}
 
 # Potion definitions — icons from items.txt rows 20-21 (0-indexed)
-_POTIONS: List[Dict[str, object]] = [
-    {"name": "Health Potion",        "effect": "hp_60",          "icon": (19, 1), "color": (200, 60,  60),  "rarity": "common",    "cost": 25,  "desc": "Restores 60 HP.",                 "item_type": "consumable", "equip_slot": ""},
-    {"name": "Greater Health Flask", "effect": "hp_80",          "icon": (19, 3), "color": (180, 40,  40),  "rarity": "rare",      "cost": 45,  "desc": "Restores 80 HP.",                 "item_type": "consumable", "equip_slot": ""},
-    {"name": "Mana Potion",          "effect": "mp_80",          "icon": (20, 3), "color": (60,  100, 210),  "rarity": "common",    "cost": 30,  "desc": "Restores 80 mana.",               "item_type": "consumable", "equip_slot": ""},
-    {"name": "Swift Tonic",          "effect": "speed_boost_60", "icon": (20, 4), "color": (80,  180, 220),  "rarity": "rare",      "cost": 35,  "desc": "Grants +28% move speed for 60s.", "item_type": "consumable", "equip_slot": ""},
-    {"name": "Battle Brew",          "effect": "dmg_boost",      "icon": (19, 2), "color": (160, 100, 50),   "rarity": "rare",      "cost": 40,  "desc": "Grants +20% damage for 90s.",     "item_type": "consumable", "equip_slot": ""},
-    {"name": "Elixir of Life",       "effect": "full_restore",   "icon": (19, 0), "color": (200, 160, 60),   "rarity": "legendary", "cost": 120, "desc": "Fully restores HP and mana.",     "item_type": "consumable", "equip_slot": ""},
-]
 VENDOR_SHOPS.update({
     "Herbalist":     [p for p in _POTIONS if p["effect"] in ("hp_60", "hp_80", "mp_80", "full_restore")],
     "Quartermaster": list(_POTIONS),
 })
 
 
-TELEPORT_BOOK_ITEM: Dict[str, object] = {
-    "id": "book_of_teleportation",
-    "name": "Book of Teleportation",
-    "effect": "teleport_book",
-    "color": (120, 80, 200),
-    "rarity": "legendary",
-    "item_type": "consumable",
-    "equip_slot": "",
-    "desc": "An ancient tome of arcane travel. Use to open a portal to any known location.",
-    "permanent": True,
-}
 for _set_data in CLASS_ARMOR_SETS.values():
     pieces = _set_data.get("pieces")
     if not isinstance(pieces, list):
@@ -130,47 +112,8 @@ for _set_data in CLASS_ARMOR_SETS.values():
         _slot = str(_piece.get("slot", "")).strip().lower()
         if _slot in EQUIPMENT_SLOT_ORDER:
             ITEM_SHEET_SLOT_HINTS[(_row, _col)] = _slot
-CLASS_ARMOR_SET_BONUSES: Dict[str, Dict[int, Dict[str, float]]] = {
-    "mage": {
-        2: {"spell_power": 6.0},
-        4: {"max_mana": 14.0, "cooldown_reduction": 0.03},
-        6: {"spell_power": 12.0, "mana_regen": 1.1},
-    },
-    "ranger": {
-        2: {"move_speed": 0.04, "basic_damage": 5.0},
-        4: {"cooldown_reduction": 0.05, "max_hp": 15.0},
-        6: {"basic_damage": 10.0, "armor": 10.0},
-    },
-    "rogue": {
-        2: {"move_speed": 0.03, "spell_power": 4.0},
-        4: {"cooldown_reduction": 0.04, "max_hp": 10.0},
-        6: {"spell_power": 9.0, "basic_damage": 4.0},
-    },
-    "necromancer": {
-        2: {"spell_power": 5.0, "max_mana": 10.0},
-        4: {"mana_regen": 0.8, "cooldown_reduction": 0.03},
-        6: {"spell_power": 11.0, "max_hp": 14.0},
-    },
-    "warrior": {
-        2: {"armor": 18.0, "max_hp": 16.0},
-        4: {"damage_reduction": 0.04, "basic_damage": 4.0},
-        6: {"armor": 28.0, "max_hp": 24.0, "basic_damage": 6.0},
-    },
-    "paladin": {
-        2: {"armor": 14.0, "max_mana": 10.0},
-        4: {"cooldown_reduction": 0.03, "damage_reduction": 0.03},
-        6: {"armor": 22.0, "basic_damage": 4.0, "spell_power": 6.0},
-    },
-}
 
 # ── Crafting: materials dropped by wolves ─────────────────────────────────────
-WOLF_MATERIALS: Dict[str, Dict] = {
-    "wolf_pelt": {"name": "Wolf Pelt",  "color": (160, 130, 100), "drop_chance": 0.70, "max_drop": 2},
-    "wolf_fang": {"name": "Wolf Fang",  "color": (220, 215, 195), "drop_chance": 0.50, "max_drop": 2},
-    "wolf_claw": {"name": "Wolf Claw",  "color": (175, 165, 140), "drop_chance": 0.40, "max_drop": 2},
-    "wolf_bone": {"name": "Wolf Bone",  "color": (200, 195, 180), "drop_chance": 0.35, "max_drop": 2},
-    "venom_sac": {"name": "Venom Sac",  "color": ( 90, 175,  75), "drop_chance": 0.22, "max_drop": 1},
-}
 
 PASSIVE_ANIMAL_MATERIALS: Dict[str, Dict] = {
     "deer_hide":    {"name": "Deer Hide",    "color": (180, 150, 120), "drop_chance": 0.80, "max_drop": 2},
@@ -214,28 +157,8 @@ ANIMAL_MATERIAL_MAP: Dict[str, List[str]] = {
     "Musk Ox":        ["deer_hide", "venison"],
 }
 
-MATERIAL_ORDER = ["wolf_pelt", "wolf_fang", "wolf_claw", "wolf_bone", "venom_sac", "deer_hide", "venison", "bird_feather", "poultry", "rat_tail", "arctic_fish", "icefish_oil", "frost_roe"]
 
 # ── Quests ────────────────────────────────────────────────────────────────────
-PROFESSION_DEFINITIONS: Dict[str, Dict[str, object]] = {
-    "alchemy": {
-        "name": "Alchemy",
-        "desc": "Brew combat tonics and battle elixirs from wild reagents.",
-        "color": (92, 168, 122),
-    },
-    "blacksmithing": {
-        "name": "Blacksmithing",
-        "desc": "Forge durable weapons and armor from beast remains.",
-        "color": (156, 126, 88),
-    },
-    "runecrafting": {
-        "name": "Runecrafting",
-        "desc": "Bind charms and sigils for permanent character upgrades.",
-        "color": (128, 124, 210),
-    },
-}
-PROFESSION_ORDER = ["alchemy", "blacksmithing", "runecrafting"]
-PROFESSION_MAX_SKILL = 150
 
 CRAFTING_RECIPES: List[Dict] = [
     # Alchemy
