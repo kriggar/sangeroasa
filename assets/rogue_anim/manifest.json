@@ -1,14 +1,26 @@
 {
  "idle_down": {
-  "frames": 1,
+  "frames": 8,
   "fps": 6.0
  },
- "idle_up": {
-  "frames": 1,
-  "fps": 6.0
+ "walk_down": {
+  "frames": 8,
+  "fps": 9.0
  },
- "idle_right": {
-  "frames": 1,
-  "fps": 6.0
+ "run_down": {
+  "frames": 8,
+  "fps": 13.0
+ },
+ "attack_down": {
+  "frames": 8,
+  "fps": 12.0
+ },
+ "hurt_down": {
+  "frames": 8,
+  "fps": 10.0
+ },
+ "death_down": {
+  "frames": 8,
+  "fps": 7.0
  }
 }
